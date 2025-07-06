@@ -5,6 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>AI Avatar Content Analyzer</title>
     <link rel="stylesheet" href="popup.css">
+    <link rel="stylesheet" href="view-transitions.css">
+    <link rel="stylesheet" href="onboarding-styles.css">
 </head>
 <body>
     <!-- Skip to main content link for keyboard navigation -->
@@ -128,6 +130,17 @@
             </div>
             <form class="settings-content" role="form" aria-label="Extension settings">
                 <fieldset class="setting-group">
+                    <legend class="visually-hidden">Window Mode Preferences</legend>
+                    <label for="defaultWindowMode">Default Window Mode</label>
+                    <select id="defaultWindowMode" aria-label="Select default window mode">
+                        <option value="auto">Auto-detect based on screen size</option>
+                        <option value="compact">Compact (400x600)</option>
+                        <option value="large">Large (800x800)</option>
+                        <option value="masonry">Masonry (1200x900)</option>
+                    </select>
+                    <small>Auto-detect will choose the best mode for your screen size and content complexity</small>
+                </fieldset>
+                <fieldset class="setting-group">
                     <legend class="visually-hidden">API Configuration</legend>
                     <label for="apiKeyInput">OpenAI API Key</label>
                     <input type="password" id="apiKeyInput" placeholder="sk-..." aria-describedby="apiKeyHelp">
@@ -172,6 +185,22 @@
                     </div>
                 </fieldset>
                 <button class="save-settings" id="saveSettings" type="submit" aria-label="Save all settings">Save Settings</button>
+                
+                <!-- Keyboard Shortcuts Section -->
+                <fieldset class="setting-group" style="margin-top: 20px; padding-top: 20px; border-top: 1px solid #e2e8f0;">
+                    <legend>Keyboard Shortcuts</legend>
+                    <div class="shortcuts-grid" style="display: grid; grid-template-columns: 1fr auto; gap: 8px; font-size: 13px;">
+                        <span>Switch to Compact Mode</span>
+                        <kbd class="keyboard-shortcut">Ctrl+Shift+C</kbd>
+                        <span>Switch to Large Mode</span>
+                        <kbd class="keyboard-shortcut">Ctrl+Shift+L</kbd>
+                        <span>Switch to Masonry Mode</span>
+                        <kbd class="keyboard-shortcut">Ctrl+Shift+M</kbd>
+                        <span>Open Detached Window</span>
+                        <kbd class="keyboard-shortcut">Ctrl+Shift+D</kbd>
+                    </div>
+                </fieldset>
+                
                 <div style="margin-top: 20px; padding-top: 20px; border-top: 1px solid #e2e8f0;">
                     <button class="onboarding-tour-btn" id="revisitOnboarding" type="button" aria-label="Revisit the onboarding tour" style="width: 100%; padding: 10px; background: transparent; border: 2px solid #667eea; color: #667eea; border-radius: 6px; font-size: 14px; font-weight: 500; cursor: pointer; transition: all 0.2s;">
                         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="display: inline-block; margin-right: 8px; vertical-align: middle;" aria-hidden="true">
@@ -239,9 +268,48 @@
                     </svg>
                     Clear
                 </button>
+                <div class="footer-btn-group">
+                    <button class="footer-btn" id="compactModeBtn" aria-label="Switch to compact mode" title="Compact view (Ctrl+Shift+C)">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                            <polyline points="9 15 3 15 3 9"></polyline>
+                            <polyline points="15 9 21 9 21 15"></polyline>
+                            <line x1="3" y1="15" x2="10" y2="8"></line>
+                            <line x1="21" y1="9" x2="14" y2="16"></line>
+                        </svg>
+                        Compact
+                    </button>
+                    <button class="footer-btn" id="largeModeBtn" aria-label="Switch to large mode" title="Large view (Ctrl+Shift+L)">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                            <polyline points="15 3 21 3 21 9"></polyline>
+                            <polyline points="9 21 3 21 3 15"></polyline>
+                            <line x1="21" y1="3" x2="14" y2="10"></line>
+                            <line x1="3" y1="21" x2="10" y2="14"></line>
+                        </svg>
+                        Large
+                    </button>
+                    <button class="footer-btn" id="masonryModeBtn" aria-label="Switch to masonry mode" title="Masonry view (Ctrl+Shift+M)">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                            <rect x="3" y="3" width="7" height="7"></rect>
+                            <rect x="14" y="3" width="7" height="4"></rect>
+                            <rect x="14" y="9" width="7" height="5"></rect>
+                            <rect x="3" y="12" width="7" height="9"></rect>
+                        </svg>
+                        Masonry
+                    </button>
+                    <button class="footer-btn" id="detachedModeBtn" aria-label="Open in detached window" title="Detached window (Ctrl+Shift+D)">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                            <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path>
+                            <polyline points="15,3 21,3 21,9"></polyline>
+                            <line x1="10" y1="14" x2="21" y2="3"></line>
+                        </svg>
+                        Detached
+                    </button>
+                </div>
             </div>
             <div class="footer-info" role="status" aria-live="polite">
                 <span id="wordCount">0 words analyzed</span>
+                <span class="separator">•</span>
+                <span id="windowMode">Compact Mode</span>
             </div>
         </footer>
     </div>
@@ -253,6 +321,7 @@
     <script src="../lib/three.min.js"></script>
     <script src="avatar-renderer.js"></script>
     <script src="onboarding.js"></script>
+    <script src="window-manager.js"></script>
     <script src="popup.js"></script>
 </body>
 </html>

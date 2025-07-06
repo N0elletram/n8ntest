@@ -66,6 +66,11 @@ class PopupController {
    */
   async init() {
     try {
+      // Initialize window manager if available
+      if (typeof WindowManager !== 'undefined') {
+        this.windowManager = new WindowManager();
+      }
+      
       // Check if onboarding should be shown
       const shouldShowOnboarding = await OnboardingWizard.shouldShow();
       

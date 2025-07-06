@@ -1,0 +1,1338 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Avatar - Masonry Layout</title>
+    <style>
+        /* AI Avatar Extension - Masonry Layout Styles */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        /* Accessibility utilities */
+        .visually-hidden {
+            position: absolute;
+            width: 1px;
+            height: 1px;
+            padding: 0;
+            margin: -1px;
+            overflow: hidden;
+            clip: rect(0, 0, 0, 0);
+            white-space: nowrap;
+            border-width: 0;
+        }
+
+        /* Focus styles */
+        *:focus {
+            outline: 2px solid #667eea;
+            outline-offset: 2px;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: #333;
+            overflow-x: hidden;
+        }
+
+        /* Responsive container */
+        .container {
+            width: 100%;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 16px;
+        }
+
+        /* Header */
+        .header {
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+            padding: 12px 0;
+        }
+
+        .header-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .logo-icon {
+            width: 32px;
+            height: 32px;
+            border-radius: 8px;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 16px;
+            font-weight: bold;
+        }
+
+        .logo-text {
+            font-weight: 700;
+            font-size: 20px;
+            color: #2d3748;
+        }
+
+        .header-controls {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .view-toggle {
+            display: flex;
+            background: #f7fafc;
+            border-radius: 8px;
+            padding: 4px;
+            border: 1px solid #e2e8f0;
+        }
+
+        .view-toggle button {
+            background: none;
+            border: none;
+            padding: 8px 12px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 14px;
+            color: #718096;
+            transition: all 0.2s;
+        }
+
+        .view-toggle button.active {
+            background: #667eea;
+            color: white;
+            box-shadow: 0 2px 4px rgba(102, 126, 234, 0.2);
+        }
+
+        .settings-btn {
+            background: #667eea;
+            color: white;
+            border: none;
+            padding: 8px 12px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 14px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            transition: all 0.2s;
+        }
+
+        .settings-btn:hover {
+            background: #5a67d8;
+            transform: translateY(-1px);
+        }
+
+        /* Window Mode Selector */
+        .window-mode-selector {
+            display: flex;
+            gap: 4px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 8px;
+            padding: 4px;
+            margin-right: 12px;
+        }
+
+        .mode-btn {
+            background: none;
+            border: none;
+            cursor: pointer;
+            padding: 8px 10px;
+            border-radius: 6px;
+            color: rgba(255, 255, 255, 0.7);
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .mode-btn:hover {
+            background: rgba(255, 255, 255, 0.15);
+            color: white;
+        }
+
+        .mode-btn.active {
+            background: rgba(255, 255, 255, 0.25);
+            color: white;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        /* Settings Modal */
+        .settings-modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            z-index: 1000;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .settings-modal-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.5);
+            backdrop-filter: blur(4px);
+        }
+
+        .settings-modal-content {
+            position: relative;
+            background: white;
+            border-radius: 16px;
+            width: 90%;
+            max-width: 500px;
+            max-height: 80vh;
+            overflow-y: auto;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2);
+            animation: modalSlideIn 0.3s ease;
+        }
+
+        @keyframes modalSlideIn {
+            from {
+                opacity: 0;
+                transform: translateY(-20px) scale(0.95);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0) scale(1);
+            }
+        }
+
+        .settings-modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px 24px;
+            border-bottom: 1px solid #e2e8f0;
+        }
+
+        .settings-modal-header h2 {
+            margin: 0;
+            color: #2d3748;
+            font-size: 20px;
+        }
+
+        .settings-close-btn {
+            background: none;
+            border: none;
+            font-size: 24px;
+            color: #718096;
+            cursor: pointer;
+            padding: 4px;
+            border-radius: 4px;
+            transition: all 0.2s;
+        }
+
+        .settings-close-btn:hover {
+            background: #f7fafc;
+            color: #2d3748;
+        }
+
+        .settings-modal-body {
+            padding: 24px;
+        }
+
+        .setting-group {
+            border: none;
+            margin: 0 0 20px 0;
+            padding: 0;
+        }
+
+        .setting-group legend {
+            font-weight: 600;
+            color: #2d3748;
+            margin-bottom: 12px;
+        }
+
+        .setting-group label {
+            display: block;
+            font-weight: 500;
+            color: #4a5568;
+            margin-bottom: 8px;
+        }
+
+        .setting-group input,
+        .setting-group select {
+            width: 100%;
+            padding: 8px 12px;
+            border: 1px solid #e2e8f0;
+            border-radius: 6px;
+            font-size: 14px;
+            transition: border-color 0.2s;
+        }
+
+        .setting-group input:focus,
+        .setting-group select:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        .setting-group small {
+            display: block;
+            color: #718096;
+            font-size: 12px;
+            margin-top: 4px;
+        }
+
+        .setting-group input[type="checkbox"] {
+            width: auto;
+            margin-right: 8px;
+        }
+
+        .save-settings-btn {
+            background: #667eea;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            width: 100%;
+            transition: all 0.2s;
+        }
+
+        .save-settings-btn:hover {
+            background: #5a67d8;
+            transform: translateY(-1px);
+        }
+
+        /* Main content area */
+        .main-content {
+            padding: 24px 0;
+            min-height: calc(100vh - 100px);
+        }
+
+        /* Masonry grid */
+        .masonry-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+            gap: 20px;
+            align-items: start;
+        }
+
+        /* Card base styles */
+        .card {
+            background: white;
+            border-radius: 16px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+            transition: all 0.3s ease;
+            position: relative;
+        }
+
+        .card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.15);
+        }
+
+        .card-header {
+            padding: 20px 20px 0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .card-title {
+            font-size: 18px;
+            font-weight: 600;
+            color: #2d3748;
+        }
+
+        .card-subtitle {
+            font-size: 14px;
+            color: #718096;
+            margin-top: 4px;
+        }
+
+        .card-content {
+            padding: 20px;
+        }
+
+        .card-actions {
+            padding: 0 20px 20px;
+        }
+
+        /* Hero Avatar Card */
+        .avatar-card {
+            grid-column: span 2;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            min-height: 300px;
+            display: flex;
+            flex-direction: column;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .avatar-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><defs><pattern id="grid" width="10" height="10" patternUnits="userSpaceOnUse"><path d="M 10 0 L 0 0 0 10" fill="none" stroke="rgba(255,255,255,0.1)" stroke-width="1"/></pattern></defs><rect width="100" height="100" fill="url(%23grid)"/></svg>');
+            opacity: 0.3;
+        }
+
+        .avatar-container {
+            position: relative;
+            height: 200px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1;
+        }
+
+        .avatar-canvas {
+            width: 100%;
+            height: 100%;
+            border-radius: 12px;
+        }
+
+        .avatar-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 12px;
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+
+        .avatar-overlay:hover {
+            opacity: 1;
+        }
+
+        .avatar-status {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background: rgba(255, 255, 255, 0.2);
+            backdrop-filter: blur(10px);
+            padding: 8px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .status-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: #48bb78;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+
+        /* Analysis Cards */
+        .analysis-card {
+            background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+        }
+
+        .analysis-icon {
+            width: 48px;
+            height: 48px;
+            border-radius: 12px;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 20px;
+            margin-bottom: 16px;
+        }
+
+        .metric-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px 0;
+            border-bottom: 1px solid #e2e8f0;
+        }
+
+        .metric-row:last-child {
+            border-bottom: none;
+        }
+
+        .metric-label {
+            font-size: 14px;
+            color: #718096;
+        }
+
+        .metric-value {
+            font-size: 16px;
+            font-weight: 600;
+            color: #2d3748;
+        }
+
+        /* Conversation Card */
+        .conversation-card {
+            max-height: 400px;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .conversation-history {
+            flex: 1;
+            overflow-y: auto;
+            padding: 16px;
+            max-height: 250px;
+        }
+
+        .message {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 12px;
+        }
+
+        .message.user {
+            flex-direction: row-reverse;
+        }
+
+        .message-avatar {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 16px;
+            flex-shrink: 0;
+        }
+
+        .message.ai .message-avatar {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+        }
+
+        .message.user .message-avatar {
+            background: #e2e8f0;
+            color: #4a5568;
+        }
+
+        .message-content {
+            flex: 1;
+            background: #f7fafc;
+            padding: 8px 12px;
+            border-radius: 12px;
+            font-size: 14px;
+            line-height: 1.4;
+        }
+
+        .message.user .message-content {
+            background: #667eea;
+            color: white;
+        }
+
+        .message-input {
+            padding: 16px;
+            border-top: 1px solid #e2e8f0;
+        }
+
+        .input-container {
+            display: flex;
+            gap: 8px;
+            align-items: flex-end;
+        }
+
+        .message-textarea {
+            flex: 1;
+            border: 1px solid #e2e8f0;
+            border-radius: 12px;
+            padding: 8px 12px;
+            resize: none;
+            font-size: 14px;
+            outline: none;
+            transition: border-color 0.2s;
+        }
+
+        .message-textarea:focus {
+            border-color: #667eea;
+        }
+
+        .send-btn {
+            background: #667eea;
+            color: white;
+            border: none;
+            padding: 8px 12px;
+            border-radius: 12px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: all 0.2s;
+        }
+
+        .send-btn:hover {
+            background: #5a67d8;
+        }
+
+        /* Quick Actions Card */
+        .quick-actions-card {
+            background: linear-gradient(135deg, #48bb78 0%, #38a169 100%);
+            color: white;
+        }
+
+        .actions-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 12px;
+        }
+
+        .action-tile {
+            background: rgba(255, 255, 255, 0.2);
+            border: none;
+            border-radius: 12px;
+            padding: 16px;
+            cursor: pointer;
+            transition: all 0.2s;
+            text-align: center;
+            color: white;
+            font-size: 14px;
+        }
+
+        .action-tile:hover {
+            background: rgba(255, 255, 255, 0.3);
+            transform: translateY(-2px);
+        }
+
+        .action-icon {
+            font-size: 24px;
+            margin-bottom: 8px;
+            display: block;
+        }
+
+        /* Performance Metrics Card */
+        .performance-card {
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            color: white;
+        }
+
+        .metrics-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 16px;
+        }
+
+        .metric-item {
+            text-align: center;
+        }
+
+        .metric-number {
+            font-size: 24px;
+            font-weight: 700;
+            margin-bottom: 4px;
+        }
+
+        .metric-unit {
+            font-size: 12px;
+            opacity: 0.8;
+        }
+
+        /* Progress bars */
+        .progress-bar {
+            background: rgba(255, 255, 255, 0.3);
+            border-radius: 10px;
+            height: 8px;
+            overflow: hidden;
+            margin-top: 8px;
+        }
+
+        .progress-fill {
+            background: white;
+            height: 100%;
+            border-radius: 10px;
+            transition: width 0.3s ease;
+        }
+
+        /* Insights Card */
+        .insights-card {
+            background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+            color: white;
+        }
+
+        .insight-item {
+            padding: 12px 0;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .insight-item:last-child {
+            border-bottom: none;
+        }
+
+        .insight-title {
+            font-size: 14px;
+            font-weight: 600;
+            margin-bottom: 4px;
+        }
+
+        .insight-description {
+            font-size: 12px;
+            opacity: 0.9;
+        }
+
+        /* Topics Card */
+        .topics-card .topic-tags {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+
+        .topic-tag {
+            background: #667eea;
+            color: white;
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 500;
+        }
+
+        /* Sentiment Card */
+        .sentiment-card {
+            background: linear-gradient(135deg, #a8edea 0%, #fed6e3 100%);
+        }
+
+        .sentiment-display {
+            text-align: center;
+            padding: 20px 0;
+        }
+
+        .sentiment-emoji {
+            font-size: 48px;
+            margin-bottom: 12px;
+        }
+
+        .sentiment-label {
+            font-size: 18px;
+            font-weight: 600;
+            color: #2d3748;
+        }
+
+        .sentiment-score {
+            font-size: 14px;
+            color: #718096;
+        }
+
+        /* Responsive design */
+        @media (max-width: 768px) {
+            .masonry-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .avatar-card {
+                grid-column: span 1;
+            }
+            
+            .header-controls {
+                flex-direction: column;
+                gap: 8px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .container {
+                padding: 0 12px;
+            }
+            
+            .main-content {
+                padding: 16px 0;
+            }
+            
+            .masonry-grid {
+                gap: 16px;
+            }
+        }
+
+        /* Chrome extension specific styles */
+        @media (max-width: 400px) {
+            body {
+                width: 400px;
+                height: 600px;
+                overflow-y: auto;
+            }
+            
+            .masonry-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .avatar-card {
+                grid-column: span 1;
+                min-height: 200px;
+            }
+            
+            .avatar-container {
+                height: 120px;
+            }
+        }
+
+        /* Loading states */
+        .loading-skeleton {
+            background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+            background-size: 200% 100%;
+            animation: skeleton-loading 1.5s infinite;
+            border-radius: 8px;
+            height: 20px;
+            margin: 8px 0;
+        }
+
+        @keyframes skeleton-loading {
+            0% { background-position: 200% 0; }
+            100% { background-position: -200% 0; }
+        }
+
+        /* Smooth scrolling */
+        html {
+            scroll-behavior: smooth;
+        }
+
+        /* Custom scrollbar */
+        ::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: #f1f1f1;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: #cbd5e0;
+            border-radius: 3px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: #a0aec0;
+        }
+    </style>
+</head>
+<body>
+    <!-- Skip to main content for accessibility -->
+    <a href="#main-content" class="visually-hidden">Skip to main content</a>
+
+    <!-- Header -->
+    <header class="header">
+        <div class="container">
+            <div class="header-content">
+                <div class="logo">
+                    <div class="logo-icon">🤖</div>
+                    <h1 class="logo-text">AI Avatar</h1>
+                </div>
+                <div class="header-controls">
+                    <div class="window-mode-selector" role="group" aria-label="Window mode selection">
+                        <button class="mode-btn" id="compactModeBtn" aria-label="Switch to compact mode" title="Compact Mode (Ctrl+Shift+C)">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                                <polyline points="9 15 3 15 3 9"></polyline>
+                                <polyline points="15 9 21 9 21 15"></polyline>
+                                <line x1="3" y1="15" x2="10" y2="8"></line>
+                                <line x1="21" y1="9" x2="14" y2="16"></line>
+                            </svg>
+                        </button>
+                        <button class="mode-btn" id="largeModeBtn" aria-label="Switch to large mode" title="Large Mode (Ctrl+Shift+L)">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                                <polyline points="15 3 21 3 21 9"></polyline>
+                                <polyline points="9 21 3 21 3 15"></polyline>
+                                <line x1="21" y1="3" x2="14" y2="10"></line>
+                                <line x1="3" y1="21" x2="10" y2="14"></line>
+                            </svg>
+                        </button>
+                        <button class="mode-btn active" id="masonryModeBtn" aria-label="Masonry mode active" title="Masonry Mode (Ctrl+Shift+M)">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                                <rect x="3" y="3" width="7" height="7"></rect>
+                                <rect x="14" y="3" width="7" height="4"></rect>
+                                <rect x="14" y="9" width="7" height="5"></rect>
+                                <rect x="3" y="12" width="7" height="9"></rect>
+                            </svg>
+                        </button>
+                        <button class="mode-btn" id="detachedModeBtn" aria-label="Open in detached window" title="Detached Window (Ctrl+Shift+D)">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                                <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path>
+                                <polyline points="15 3 21 3 21 9"></polyline>
+                                <line x1="10" y1="14" x2="21" y2="3"></line>
+                            </svg>
+                        </button>
+                    </div>
+                    <button class="settings-btn" onclick="openSettings()">
+                        <span>⚙️</span>
+                        Settings
+                    </button>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="main-content" id="main-content">
+        <div class="container">
+            <div class="masonry-grid">
+                <!-- AI Avatar Hero Card -->
+                <div class="card avatar-card">
+                    <div class="avatar-status">
+                        <div class="status-dot"></div>
+                        <span>Online</span>
+                    </div>
+                    <div class="avatar-container">
+                        <canvas class="avatar-canvas" id="avatarCanvas" width="300" height="200"></canvas>
+                        <div class="avatar-overlay">
+                            <div style="text-align: center;">
+                                <div style="font-size: 24px; margin-bottom: 8px;">🤖</div>
+                                <div style="font-size: 14px;">3D Avatar Ready</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="card-content">
+                        <h2 style="font-size: 20px; margin-bottom: 8px;">AI Avatar Assistant</h2>
+                        <p style="opacity: 0.9; font-size: 14px;">Your intelligent companion for web content analysis and conversation.</p>
+                    </div>
+                </div>
+
+                <!-- Content Analysis Card -->
+                <div class="card analysis-card">
+                    <div class="card-header">
+                        <div>
+                            <h3 class="card-title">Content Analysis</h3>
+                            <p class="card-subtitle">Current page insights</p>
+                        </div>
+                    </div>
+                    <div class="card-content">
+                        <div class="analysis-icon">📊</div>
+                        <div class="metric-row">
+                            <span class="metric-label">Word Count</span>
+                            <span class="metric-value" id="wordCount">1,247</span>
+                        </div>
+                        <div class="metric-row">
+                            <span class="metric-label">Reading Time</span>
+                            <span class="metric-value" id="readingTime">5 min</span>
+                        </div>
+                        <div class="metric-row">
+                            <span class="metric-label">Complexity</span>
+                            <span class="metric-value" id="complexity">Medium</span>
+                        </div>
+                        <div class="metric-row">
+                            <span class="metric-label">Language</span>
+                            <span class="metric-value" id="language">English</span>
+                        </div>
+                    </div>
+                    <div class="card-actions">
+                        <button class="send-btn" onclick="refreshAnalysis()">Refresh Analysis</button>
+                    </div>
+                </div>
+
+                <!-- Conversation Card -->
+                <div class="card conversation-card">
+                    <div class="card-header">
+                        <div>
+                            <h3 class="card-title">Conversation</h3>
+                            <p class="card-subtitle">Chat with your AI assistant</p>
+                        </div>
+                    </div>
+                    <div class="conversation-history" id="conversationHistory">
+                        <div class="message ai">
+                            <div class="message-avatar">🤖</div>
+                            <div class="message-content">
+                                Hi! I've analyzed this webpage and I'm ready to discuss its content with you. What would you like to know?
+                            </div>
+                        </div>
+                    </div>
+                    <div class="message-input">
+                        <div class="input-container">
+                            <textarea class="message-textarea" placeholder="Ask me anything about this page..." rows="2" id="messageInput"></textarea>
+                            <button class="send-btn" onclick="sendMessage()">Send</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Quick Actions Card -->
+                <div class="card quick-actions-card">
+                    <div class="card-header">
+                        <div>
+                            <h3 class="card-title" style="color: white;">Quick Actions</h3>
+                            <p class="card-subtitle" style="color: rgba(255,255,255,0.8);">Common tasks</p>
+                        </div>
+                    </div>
+                    <div class="card-content">
+                        <div class="actions-grid">
+                            <button class="action-tile" onclick="quickAction('summarize')">
+                                <span class="action-icon">📝</span>
+                                Summarize
+                            </button>
+                            <button class="action-tile" onclick="quickAction('explain')">
+                                <span class="action-icon">💡</span>
+                                Explain
+                            </button>
+                            <button class="action-tile" onclick="quickAction('questions')">
+                                <span class="action-icon">❓</span>
+                                Questions
+                            </button>
+                            <button class="action-tile" onclick="quickAction('translate')">
+                                <span class="action-icon">🌐</span>
+                                Translate
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Sentiment Analysis Card -->
+                <div class="card sentiment-card">
+                    <div class="card-header">
+                        <div>
+                            <h3 class="card-title">Sentiment Analysis</h3>
+                            <p class="card-subtitle">Emotional tone detection</p>
+                        </div>
+                    </div>
+                    <div class="card-content">
+                        <div class="sentiment-display">
+                            <div class="sentiment-emoji">😊</div>
+                            <div class="sentiment-label">Positive</div>
+                            <div class="sentiment-score">Confidence: 85%</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Topics Card -->
+                <div class="card topics-card">
+                    <div class="card-header">
+                        <div>
+                            <h3 class="card-title">Key Topics</h3>
+                            <p class="card-subtitle">Main themes identified</p>
+                        </div>
+                    </div>
+                    <div class="card-content">
+                        <div class="topic-tags">
+                            <span class="topic-tag">Technology</span>
+                            <span class="topic-tag">AI</span>
+                            <span class="topic-tag">Web Development</span>
+                            <span class="topic-tag">Chrome Extension</span>
+                            <span class="topic-tag">User Interface</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Performance Metrics Card -->
+                <div class="card performance-card">
+                    <div class="card-header">
+                        <div>
+                            <h3 class="card-title" style="color: white;">Performance</h3>
+                            <p class="card-subtitle" style="color: rgba(255,255,255,0.8);">Usage statistics</p>
+                        </div>
+                    </div>
+                    <div class="card-content">
+                        <div class="metrics-grid">
+                            <div class="metric-item">
+                                <div class="metric-number">1,247</div>
+                                <div class="metric-unit">Tokens Used</div>
+                                <div class="progress-bar">
+                                    <div class="progress-fill" style="width: 45%"></div>
+                                </div>
+                            </div>
+                            <div class="metric-item">
+                                <div class="metric-number">23</div>
+                                <div class="metric-unit">Requests Today</div>
+                                <div class="progress-bar">
+                                    <div class="progress-fill" style="width: 23%"></div>
+                                </div>
+                            </div>
+                            <div class="metric-item">
+                                <div class="metric-number">$2.47</div>
+                                <div class="metric-unit">Cost Today</div>
+                                <div class="progress-bar">
+                                    <div class="progress-fill" style="width: 25%"></div>
+                                </div>
+                            </div>
+                            <div class="metric-item">
+                                <div class="metric-number">98%</div>
+                                <div class="metric-unit">Uptime</div>
+                                <div class="progress-bar">
+                                    <div class="progress-fill" style="width: 98%"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Insights Card -->
+                <div class="card insights-card">
+                    <div class="card-header">
+                        <div>
+                            <h3 class="card-title" style="color: white;">Smart Insights</h3>
+                            <p class="card-subtitle" style="color: rgba(255,255,255,0.8);">AI-powered recommendations</p>
+                        </div>
+                    </div>
+                    <div class="card-content">
+                        <div class="insight-item">
+                            <div class="insight-title">📈 Engagement Trend</div>
+                            <div class="insight-description">Content shows high engagement potential based on topic analysis</div>
+                        </div>
+                        <div class="insight-item">
+                            <div class="insight-title">🎯 Key Takeaway</div>
+                            <div class="insight-description">Main focus appears to be on technical implementation details</div>
+                        </div>
+                        <div class="insight-item">
+                            <div class="insight-title">💡 Suggestion</div>
+                            <div class="insight-description">Consider asking about specific technical aspects for deeper understanding</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Settings Modal -->
+    <div id="settingsModal" class="settings-modal" style="display: none;">
+        <div class="settings-modal-overlay" onclick="hideSettingsModal()"></div>
+        <div class="settings-modal-content">
+            <div class="settings-modal-header">
+                <h2>Settings</h2>
+                <button class="settings-close-btn" onclick="hideSettingsModal()">×</button>
+            </div>
+            <form class="settings-modal-body">
+                <fieldset class="setting-group">
+                    <legend class="visually-hidden">Window Mode Preferences</legend>
+                    <label for="defaultWindowMode">Default Window Mode</label>
+                    <select id="defaultWindowMode" aria-label="Select default window mode">
+                        <option value="auto">Auto-detect based on screen size</option>
+                        <option value="compact">Compact (400x600)</option>
+                        <option value="large">Large (800x800)</option>
+                        <option value="masonry">Masonry (1200x900)</option>
+                    </select>
+                    <small>Auto-detect will choose the best mode for your screen size and content complexity</small>
+                </fieldset>
+                <fieldset class="setting-group">
+                    <legend class="visually-hidden">API Configuration</legend>
+                    <label for="apiKeyInput">OpenAI API Key</label>
+                    <input type="password" id="apiKeyInput" placeholder="sk-..." aria-describedby="apiKeyHelp">
+                    <small id="apiKeyHelp">Your API key is stored locally and never shared</small>
+                </fieldset>
+                <fieldset class="setting-group">
+                    <legend class="visually-hidden">Avatar Preferences</legend>
+                    <label for="personalitySelect">Avatar Personality</label>
+                    <select id="personalitySelect" aria-label="Select avatar personality type">
+                        <option value="helpful">Helpful & Professional</option>
+                        <option value="casual">Casual & Friendly</option>
+                        <option value="academic">Academic & Detailed</option>
+                        <option value="creative">Creative & Engaging</option>
+                    </select>
+                </fieldset>
+                <fieldset class="setting-group">
+                    <legend class="visually-hidden">Automation Settings</legend>
+                    <label for="autoAnalyze">
+                        <input type="checkbox" id="autoAnalyze" checked>
+                        Auto-analyze pages when opened
+                    </label>
+                </fieldset>
+                <fieldset class="setting-group">
+                    <label for="enableStreaming">
+                        <input type="checkbox" id="enableStreaming" checked>
+                        Enable streaming responses (real-time typing effect)
+                    </label>
+                </fieldset>
+                <fieldset class="setting-group">
+                    <legend>Rate Limits (Daily)</legend>
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 8px;">
+                        <div>
+                            <label for="dailyTokenLimit" style="font-size: 12px;">Tokens</label>
+                            <input type="number" id="dailyTokenLimit" placeholder="100000" min="1000" step="1000" aria-label="Daily token limit">
+                        </div>
+                        <div>
+                            <label for="dailyCostLimit" style="font-size: 12px;">Cost ($)</label>
+                            <input type="number" id="dailyCostLimit" placeholder="10.00" min="0.01" step="0.01" aria-label="Daily cost limit in dollars">
+                        </div>
+                    </div>
+                </fieldset>
+                <button class="save-settings-btn" type="submit">Save Settings</button>
+                
+                <!-- Keyboard Shortcuts Section -->
+                <fieldset class="setting-group" style="margin-top: 20px; padding-top: 20px; border-top: 1px solid #e2e8f0;">
+                    <legend>Keyboard Shortcuts</legend>
+                    <div class="shortcuts-grid" style="display: grid; grid-template-columns: 1fr auto; gap: 8px; font-size: 13px;">
+                        <span>Switch to Compact Mode</span>
+                        <kbd class="keyboard-shortcut">Ctrl+Shift+C</kbd>
+                        <span>Switch to Large Mode</span>
+                        <kbd class="keyboard-shortcut">Ctrl+Shift+L</kbd>
+                        <span>Switch to Masonry Mode</span>
+                        <kbd class="keyboard-shortcut">Ctrl+Shift+M</kbd>
+                        <span>Open Detached Window</span>
+                        <kbd class="keyboard-shortcut">Ctrl+Shift+D</kbd>
+                    </div>
+                </fieldset>
+            </form>
+        </div>
+    </div>
+
+    <!-- JavaScript -->
+    <script src="window-manager.js"></script>
+    <script>
+        // Toggle between masonry and classic view
+        function toggleView(viewType) {
+            const buttons = document.querySelectorAll('.view-toggle button');
+            buttons.forEach(btn => btn.classList.remove('active'));
+            event.target.classList.add('active');
+            
+            if (viewType === 'classic') {
+                // Switch to classic popup
+                window.location.href = 'popup.html';
+            }
+        }
+        
+        // Initialize window manager when DOM is ready
+        document.addEventListener('DOMContentLoaded', function() {
+            // Include window manager functionality
+            if (typeof WindowManager !== 'undefined') {
+                window.windowManager = new WindowManager();
+                window.windowManager.currentMode = 'masonry';
+                window.windowManager.updateUI();
+            }
+        });
+
+        // Open settings
+        function openSettings() {
+            showSettingsModal();
+        }
+        
+        // Settings modal functionality
+        function showSettingsModal() {
+            const modal = document.getElementById('settingsModal');
+            if (modal) {
+                modal.style.display = 'flex';
+                document.body.style.overflow = 'hidden';
+            }
+        }
+        
+        function hideSettingsModal() {
+            const modal = document.getElementById('settingsModal');
+            if (modal) {
+                modal.style.display = 'none';
+                document.body.style.overflow = 'auto';
+            }
+        }
+
+        // Send message
+        function sendMessage() {
+            const input = document.getElementById('messageInput');
+            const message = input.value.trim();
+            
+            if (message) {
+                addMessage('user', message);
+                input.value = '';
+                
+                // Simulate AI response
+                setTimeout(() => {
+                    addMessage('ai', 'I understand your question. Let me analyze the content and provide you with a detailed response...');
+                }, 1000);
+            }
+        }
+
+        // Add message to conversation
+        function addMessage(type, content) {
+            const history = document.getElementById('conversationHistory');
+            const messageDiv = document.createElement('div');
+            messageDiv.className = `message ${type}`;
+            
+            messageDiv.innerHTML = `
+                <div class="message-avatar">${type === 'ai' ? '🤖' : '👤'}</div>
+                <div class="message-content">${content}</div>
+            `;
+            
+            history.appendChild(messageDiv);
+            history.scrollTop = history.scrollHeight;
+        }
+
+        // Quick actions
+        function quickAction(action) {
+            const actions = {
+                'summarize': 'Please provide a summary of this page.',
+                'explain': 'Can you explain the main concepts on this page?',
+                'questions': 'What key questions should I ask about this content?',
+                'translate': 'Can you help translate or explain any complex terms?'
+            };
+            
+            const message = actions[action];
+            if (message) {
+                addMessage('user', message);
+                
+                // Simulate AI response
+                setTimeout(() => {
+                    addMessage('ai', `I'll help you with that. Let me ${action} the content for you...`);
+                }, 1000);
+            }
+        }
+
+        // Refresh analysis
+        function refreshAnalysis() {
+            // Simulate refreshing analysis
+            console.log('Refreshing analysis...');
+            
+            // Update metrics with random values for demo
+            document.getElementById('wordCount').textContent = Math.floor(Math.random() * 2000) + 500;
+            document.getElementById('readingTime').textContent = Math.floor(Math.random() * 10) + 2 + ' min';
+            
+            const complexities = ['Low', 'Medium', 'High'];
+            document.getElementById('complexity').textContent = complexities[Math.floor(Math.random() * complexities.length)];
+        }
+
+        // Handle Enter key in message input
+        document.getElementById('messageInput').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter' && !e.shiftKey) {
+                e.preventDefault();
+                sendMessage();
+            }
+        });
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', function() {
+            // Simulate loading content
+            setTimeout(() => {
+                refreshAnalysis();
+            }, 500);
+        });
+
+        // Responsive masonry layout adjustment
+        function adjustMasonryLayout() {
+            const grid = document.querySelector('.masonry-grid');
+            const cards = grid.querySelectorAll('.card');
+            
+            // Auto-adjust grid columns based on container width
+            const containerWidth = grid.offsetWidth;
+            const cardMinWidth = 320;
+            const gap = 20;
+            const columns = Math.floor((containerWidth + gap) / (cardMinWidth + gap));
+            
+            grid.style.gridTemplateColumns = `repeat(${Math.max(1, columns)}, 1fr)`;
+        }
+
+        // Adjust layout on window resize
+        window.addEventListener('resize', adjustMasonryLayout);
+        document.addEventListener('DOMContentLoaded', adjustMasonryLayout);
+    </script>
+</body>
+</html>

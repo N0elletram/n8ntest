@@ -6,7 +6,7 @@
 class OnboardingWizard {
   constructor() {
     this.currentStep = 0;
-    this.totalSteps = 5;
+    this.totalSteps = 6;
     this.onComplete = null;
     this.onSkip = null;
     
@@ -92,7 +92,7 @@ class OnboardingWizard {
       },
       {
         id: 'features',
-        title: 'Key Features',
+        title: 'Key Features & Views',
         content: `
           <div class="onboarding-features">
             <div class="feature-showcase">
@@ -125,12 +125,54 @@ class OnboardingWizard {
                   <canvas id="demoAvatar" width="200" height="100"></canvas>
                 </div>
               </div>
+              
+              <div class="showcase-item" data-feature="views">
+                <div class="showcase-icon">🖥️</div>
+                <h4>Multiple View Modes</h4>
+                <p>Choose from compact, large, or masonry views to match your workflow and screen size.</p>
+                <div class="feature-demo">
+                  <div class="view-modes-demo">
+                    <div class="view-mode-option" data-mode="compact">
+                      <div class="view-preview compact-preview">
+                        <div class="preview-header"></div>
+                        <div class="preview-content">
+                          <div class="preview-section small"></div>
+                          <div class="preview-section small"></div>
+                        </div>
+                      </div>
+                      <span>Compact</span>
+                    </div>
+                    <div class="view-mode-option" data-mode="large">
+                      <div class="view-preview large-preview">
+                        <div class="preview-header"></div>
+                        <div class="preview-content">
+                          <div class="preview-section large"></div>
+                        </div>
+                      </div>
+                      <span>Large</span>
+                    </div>
+                    <div class="view-mode-option active" data-mode="masonry">
+                      <div class="view-preview masonry-preview">
+                        <div class="preview-header"></div>
+                        <div class="preview-content masonry-grid">
+                          <div class="preview-card tall"></div>
+                          <div class="preview-card short"></div>
+                          <div class="preview-card medium"></div>
+                          <div class="preview-card short"></div>
+                        </div>
+                      </div>
+                      <span>Masonry</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
             </div>
             
             <div class="feature-navigation">
               <button class="feature-nav-btn active" data-feature="analyze">Analysis</button>
               <button class="feature-nav-btn" data-feature="chat">Chat</button>
               <button class="feature-nav-btn" data-feature="avatar">Avatar</button>
+              <button class="feature-nav-btn" data-feature="views">Views</button>
             </div>
           </div>
         `,
@@ -138,6 +180,65 @@ class OnboardingWizard {
         onEnter: () => {
           this.initFeatureShowcase();
         }
+      },
+      {
+        id: 'view-modes',
+        title: 'Choose Your View',
+        content: `
+          <div class="onboarding-view-modes">
+            <p>AI Avatar offers multiple view modes to enhance your experience:</p>
+            
+            <div class="view-comparison">
+              <div class="view-card" data-view="compact">
+                <div class="view-icon">📱</div>
+                <h4>Compact Mode</h4>
+                <div class="view-features">
+                  <div class="feature">• Perfect for small screens</div>
+                  <div class="feature">• Minimal interface</div>
+                  <div class="feature">• Quick interactions</div>
+                  <div class="feature">• 400x600 popup</div>
+                </div>
+                <div class="keyboard-shortcut">Ctrl+Shift+C</div>
+              </div>
+              
+              <div class="view-card" data-view="large">
+                <div class="view-icon">🖥️</div>
+                <h4>Large Mode</h4>
+                <div class="view-features">
+                  <div class="feature">• Expanded workspace</div>
+                  <div class="feature">• Better readability</div>
+                  <div class="feature">• More conversation history</div>
+                  <div class="feature">• 800x800 window</div>
+                </div>
+                <div class="keyboard-shortcut">Ctrl+Shift+L</div>
+              </div>
+              
+              <div class="view-card recommended" data-view="masonry">
+                <div class="view-icon">🎨</div>
+                <h4>Masonry Mode</h4>
+                <div class="view-badge">Recommended</div>
+                <div class="view-features">
+                  <div class="feature">• Dynamic card layout</div>
+                  <div class="feature">• Visual analytics dashboard</div>
+                  <div class="feature">• Content-rich experience</div>
+                  <div class="feature">• 1200x900 window</div>
+                </div>
+                <div class="keyboard-shortcut">Ctrl+Shift+M</div>
+              </div>
+            </div>
+            
+            <div class="view-tips">
+              <h4>💡 Smart Tips:</h4>
+              <ul>
+                <li><strong>Auto-detection:</strong> The extension automatically chooses the best view for your screen</li>
+                <li><strong>Seamless switching:</strong> Your conversation is preserved when changing views</li>
+                <li><strong>Keyboard shortcuts:</strong> Use Ctrl+Shift+C/L/M for quick switching</li>
+                <li><strong>Content-aware:</strong> Masonry mode is recommended for complex content</li>
+              </ul>
+            </div>
+          </div>
+        `,
+        action: 'Next'
       },
       {
         id: 'try-it',

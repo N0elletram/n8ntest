@@ -1,0 +1,945 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Avatar Content Analyzer - Large View</title>
+    <link rel="stylesheet" href="popup-large.css">
+    <link rel="stylesheet" href="view-transitions.css">
+    <link rel="stylesheet" href="onboarding-styles.css">
+</head>
+<body>
+    <!-- Skip to main content link for keyboard navigation -->
+    <a href="#mainContent" class="skip-link">Skip to main content</a>
+    
+    <div id="app" role="application" aria-label="AI Avatar Content Analyzer">
+        <!-- Header -->
+        <header class="header" role="banner">
+            <div class="logo">
+                <img src="../assets/icons/icon32.png" alt="AI Avatar logo" class="logo-icon">
+                <h1 class="logo-text">AI Avatar - Large View</h1>
+            </div>
+            <div class="header-controls">
+                <div class="window-mode-selector" role="group" aria-label="Window mode selection">
+                    <button class="mode-btn" id="compactModeBtn" aria-label="Switch to compact mode" title="Compact Mode (Ctrl+Shift+C)">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                            <polyline points="9 15 3 15 3 9"></polyline>
+                            <polyline points="15 9 21 9 21 15"></polyline>
+                            <line x1="3" y1="15" x2="10" y2="8"></line>
+                            <line x1="21" y1="9" x2="14" y2="16"></line>
+                        </svg>
+                    </button>
+                    <button class="mode-btn active" id="largeModeBtn" aria-label="Large mode active" title="Large Mode (Ctrl+Shift+L)">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                            <polyline points="15 3 21 3 21 9"></polyline>
+                            <polyline points="9 21 3 21 3 15"></polyline>
+                            <line x1="21" y1="3" x2="14" y2="10"></line>
+                            <line x1="3" y1="21" x2="10" y2="14"></line>
+                        </svg>
+                    </button>
+                    <button class="mode-btn" id="masonryModeBtn" aria-label="Switch to masonry mode" title="Masonry Mode (Ctrl+Shift+M)">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                            <rect x="3" y="3" width="7" height="7"></rect>
+                            <rect x="14" y="3" width="7" height="4"></rect>
+                            <rect x="14" y="9" width="7" height="5"></rect>
+                            <rect x="3" y="12" width="7" height="9"></rect>
+                        </svg>
+                    </button>
+                    <button class="mode-btn" id="detachedModeBtn" aria-label="Open in detached window" title="Detached Window (Ctrl+Shift+D)">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                            <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path>
+                            <polyline points="15 3 21 3 21 9"></polyline>
+                            <line x1="10" y1="14" x2="21" y2="3"></line>
+                        </svg>
+                    </button>
+                </div>
+                <div class="status-indicator" id="statusIndicator" role="status" aria-live="polite" aria-label="Extension status">
+                    <span class="status-dot" aria-hidden="true"></span>
+                    <span class="status-text">Ready</span>
+                </div>
+            </div>
+        </header>
+
+        <!-- Grid Layout Controls -->
+        <div class="grid-controls" role="toolbar" aria-label="Grid layout controls">
+            <button class="grid-mode-btn active" data-layout="default" aria-label="Default layout" title="Default 2-column layout">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                    <rect x="3" y="3" width="7" height="18"></rect>
+                    <rect x="14" y="3" width="7" height="18"></rect>
+                </svg>
+            </button>
+            <button class="grid-mode-btn" data-layout="3x3" aria-label="3x3 grid layout" title="3x3 modular grid">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                    <rect x="3" y="3" width="5" height="5"></rect>
+                    <rect x="10" y="3" width="5" height="5"></rect>
+                    <rect x="17" y="3" width="5" height="5"></rect>
+                    <rect x="3" y="10" width="5" height="5"></rect>
+                    <rect x="10" y="10" width="5" height="5"></rect>
+                    <rect x="17" y="10" width="5" height="5"></rect>
+                    <rect x="3" y="17" width="5" height="5"></rect>
+                    <rect x="10" y="17" width="5" height="5"></rect>
+                    <rect x="17" y="17" width="5" height="5"></rect>
+                </svg>
+            </button>
+            <button class="grid-mode-btn" data-layout="2x3" aria-label="2x3 grid layout" title="2x3 modular grid">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                    <rect x="3" y="3" width="8" height="5"></rect>
+                    <rect x="13" y="3" width="8" height="5"></rect>
+                    <rect x="3" y="10" width="8" height="5"></rect>
+                    <rect x="13" y="10" width="8" height="5"></rect>
+                    <rect x="3" y="17" width="8" height="4"></rect>
+                    <rect x="13" y="17" width="8" height="4"></rect>
+                </svg>
+            </button>
+            <button class="grid-mode-btn" data-layout="focus" aria-label="Focus mode layout" title="Focus mode - single panel">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                    <rect x="3" y="3" width="18" height="18"></rect>
+                    <circle cx="12" cy="12" r="3"></circle>
+                </svg>
+            </button>
+            <button class="grid-indicators-toggle" id="gridIndicatorsToggle" aria-label="Toggle grid indicators" title="Show/hide grid lines">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                    <circle cx="12" cy="12" r="10"></circle>
+                    <line x1="12" y1="8" x2="12" y2="16"></line>
+                    <line x1="8" y1="12" x2="16" y2="12"></line>
+                </svg>
+            </button>
+        </div>
+
+        <!-- Main Content Modular Grid -->
+        <main class="main-content" id="mainContent" role="main" data-layout="default">
+            <!-- Grid Indicators -->
+            <div class="grid-indicators" id="gridIndicators" role="presentation" aria-hidden="true">
+                <div class="grid-line grid-line-v" style="left: 33.33%"></div>
+                <div class="grid-line grid-line-v" style="left: 66.66%"></div>
+                <div class="grid-line grid-line-h" style="top: 33.33%"></div>
+                <div class="grid-line grid-line-h" style="top: 66.66%"></div>
+            </div>
+
+            <!-- Avatar Panel -->
+            <section class="panel avatar-panel" id="avatarPanel" data-grid-area="avatar" role="region" aria-label="3D Avatar display" tabindex="0">
+                <div class="panel-header">
+                    <h2 class="panel-title">Avatar</h2>
+                    <div class="panel-controls">
+                        <button class="panel-expand-btn" aria-label="Expand avatar panel" title="Expand panel">
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                                <polyline points="15 3 21 3 21 9"></polyline>
+                                <polyline points="9 21 3 21 3 15"></polyline>
+                                <line x1="21" y1="3" x2="14" y2="10"></line>
+                                <line x1="3" y1="21" x2="10" y2="14"></line>
+                            </svg>
+                        </button>
+                        <button class="panel-close-btn" aria-label="Close avatar panel" title="Close panel">
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                                <line x1="18" y1="6" x2="6" y2="18"></line>
+                                <line x1="6" y1="6" x2="18" y2="18"></line>
+                            </svg>
+                        </button>
+                    </div>
+                </div>
+                <div class="panel-content">
+                    <div class="avatar-container" id="avatarContainer">
+                        <canvas id="avatarCanvas" width="400" height="300" role="img" aria-label="3D avatar animation" tabindex="0"></canvas>
+                        <div class="avatar-overlay">
+                            <div class="thinking-indicator" id="thinkingIndicator" role="status" aria-live="polite" aria-hidden="true">
+                                <div class="thinking-dots" aria-hidden="true">
+                                    <span></span>
+                                    <span></span>
+                                    <span></span>
+                                </div>
+                                <span class="thinking-text">Thinking...</span>
+                            </div>
+                            <div class="streaming-indicator" id="streamingIndicator" role="status" aria-live="polite" aria-hidden="true">
+                                <div class="streaming-wave" aria-hidden="true">
+                                    <span></span>
+                                    <span></span>
+                                    <span></span>
+                                    <span></span>
+                                    <span></span>
+                                </div>
+                                <span class="streaming-text">AI is typing...</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Analysis Panel -->
+            <section class="panel analysis-panel" id="analysisPanel" data-grid-area="analysis" role="region" aria-label="Page analysis results" tabindex="0">
+                <div class="panel-header">
+                    <h2 class="panel-title">Analysis</h2>
+                    <div class="panel-controls">
+                        <button class="refresh-btn" id="refreshContent" aria-label="Re-analyze current page" title="Re-analyze page">
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                                <polyline points="23 4 23 10 17 10"></polyline>
+                                <polyline points="1 20 1 14 7 14"></polyline>
+                                <path d="m3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"></path>
+                            </svg>
+                        </button>
+                        <button class="panel-expand-btn" aria-label="Expand analysis panel" title="Expand panel">
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                                <polyline points="15 3 21 3 21 9"></polyline>
+                                <polyline points="9 21 3 21 3 15"></polyline>
+                                <line x1="21" y1="3" x2="14" y2="10"></line>
+                                <line x1="3" y1="21" x2="10" y2="14"></line>
+                            </svg>
+                        </button>
+                        <button class="panel-close-btn" aria-label="Close analysis panel" title="Close panel">
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                                <line x1="18" y1="6" x2="6" y2="18"></line>
+                                <line x1="6" y1="6" x2="18" y2="18"></line>
+                            </svg>
+                        </button>
+                    </div>
+                </div>
+                <div class="panel-content">
+                    <div class="analysis-content" id="summaryContent" role="region" aria-live="polite" aria-busy="false">
+                        <div class="loading-state" role="status" aria-label="Loading page analysis">
+                            <div class="spinner" aria-hidden="true"></div>
+                            <span>Analyzing page content...</span>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Conversation Panel -->
+            <section class="panel conversation-panel" id="conversationPanel" data-grid-area="conversation" role="region" aria-label="Conversation with AI assistant" tabindex="0">
+                <div class="panel-header">
+                    <h2 class="panel-title">Conversation</h2>
+                    <div class="panel-controls">
+                        <button class="panel-expand-btn" aria-label="Expand conversation panel" title="Expand panel">
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                                <polyline points="15 3 21 3 21 9"></polyline>
+                                <polyline points="9 21 3 21 3 15"></polyline>
+                                <line x1="21" y1="3" x2="14" y2="10"></line>
+                                <line x1="3" y1="21" x2="10" y2="14"></line>
+                            </svg>
+                        </button>
+                        <button class="panel-close-btn" aria-label="Close conversation panel" title="Close panel">
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                                <line x1="18" y1="6" x2="6" y2="18"></line>
+                                <line x1="6" y1="6" x2="18" y2="18"></line>
+                            </svg>
+                        </button>
+                    </div>
+                </div>
+                <div class="panel-content">
+                    <div class="conversation-history" id="conversationHistory" role="log" aria-label="Conversation history" aria-live="polite">
+                        <div class="welcome-message">
+                            <div class="avatar-message" role="article" aria-label="AI assistant message">
+                                <div class="message-avatar" aria-hidden="true">🤖</div>
+                                <div class="message-content">
+                                    <p>Hi! I'm your AI avatar assistant. I've analyzed this webpage and I'm ready to discuss its content with you. What would you like to know?</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Input Panel -->
+            <section class="panel input-panel" id="inputPanel" data-grid-area="input" role="region" aria-label="Message input" tabindex="0">
+                <div class="panel-header">
+                    <h2 class="panel-title">Input</h2>
+                    <div class="panel-controls">
+                        <button class="panel-expand-btn" aria-label="Expand input panel" title="Expand panel">
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                                <polyline points="15 3 21 3 21 9"></polyline>
+                                <polyline points="9 21 3 21 3 15"></polyline>
+                                <line x1="21" y1="3" x2="14" y2="10"></line>
+                                <line x1="3" y1="21" x2="10" y2="14"></line>
+                            </svg>
+                        </button>
+                        <button class="panel-close-btn" aria-label="Close input panel" title="Close panel">
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                                <line x1="18" y1="6" x2="6" y2="18"></line>
+                                <line x1="6" y1="6" x2="18" y2="18"></line>
+                            </svg>
+                        </button>
+                    </div>
+                </div>
+                <div class="panel-content">
+                    <form class="input-area" role="form" aria-label="Message input form">
+                        <div class="input-container">
+                            <label for="messageInput" class="visually-hidden">Enter your message</label>
+                            <textarea 
+                                id="messageInput" 
+                                placeholder="Ask me anything about this page..."
+                                rows="3"
+                                maxlength="1000"
+                                aria-label="Message input"
+                                aria-describedby="charCount"
+                                aria-required="true"
+                            ></textarea>
+                            <div class="input-actions">
+                                <button id="sendButton" class="send-btn" disabled aria-label="Send message" type="submit">
+                                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                                        <line x1="22" y1="2" x2="11" y2="13"></line>
+                                        <polygon points="22,2 15,22 11,13 2,9"></polygon>
+                                    </svg>
+                                </button>
+                                <button id="abortButton" class="abort-btn" style="display: none;" aria-label="Stop AI response" type="button">
+                                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                                        <rect x="6" y="6" width="12" height="12"></rect>
+                                    </svg>
+                                </button>
+                            </div>
+                        </div>
+                        <div class="input-footer">
+                            <span class="char-count" id="charCount" role="status" aria-live="polite" aria-atomic="true">0/1000</span>
+                            <div class="quick-actions" role="group" aria-label="Quick action buttons">
+                                <button class="quick-action" data-action="summarize" type="button" aria-label="Summarize the page content">Summarize</button>
+                                <button class="quick-action" data-action="explain" type="button" aria-label="Explain the page content">Explain</button>
+                                <button class="quick-action" data-action="questions" type="button" aria-label="Show key points from the page">Key Points</button>
+                                <button class="quick-action" data-action="analyze" type="button" aria-label="Deep analysis of the page">Deep Analysis</button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </section>
+
+            <!-- Controls Panel -->
+            <section class="panel controls-panel" id="controlsPanel" data-grid-area="controls" role="region" aria-label="Usage statistics and controls" tabindex="0">
+                <div class="panel-header">
+                    <h2 class="panel-title">Controls</h2>
+                    <div class="panel-controls">
+                        <button class="rate-limit-refresh" id="refreshRateLimit" aria-label="Refresh usage statistics" title="Refresh usage stats">
+                            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                                <polyline points="23 4 23 10 17 10"></polyline>
+                                <polyline points="1 20 1 14 7 14"></polyline>
+                                <path d="m3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"></path>
+                            </svg>
+                        </button>
+                        <button class="panel-expand-btn" aria-label="Expand controls panel" title="Expand panel">
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                                <polyline points="15 3 21 3 21 9"></polyline>
+                                <polyline points="9 21 3 21 3 15"></polyline>
+                                <line x1="21" y1="3" x2="14" y2="10"></line>
+                                <line x1="3" y1="21" x2="10" y2="14"></line>
+                            </svg>
+                        </button>
+                        <button class="panel-close-btn" aria-label="Close controls panel" title="Close panel">
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                                <line x1="18" y1="6" x2="6" y2="18"></line>
+                                <line x1="6" y1="6" x2="18" y2="18"></line>
+                            </svg>
+                        </button>
+                    </div>
+                </div>
+                <div class="panel-content">
+                    <div class="rate-limit-status" id="rateLimitStatus" role="group" aria-label="Usage meters">
+                        <div class="rate-limit-section">
+                            <h3 class="rate-limit-title">Usage Today</h3>
+                            <div class="rate-limit-bars">
+                                <div class="rate-limit-item">
+                                    <div class="rate-limit-label" id="tokenLabel">Tokens</div>
+                                    <div class="rate-limit-bar" role="progressbar" aria-labelledby="tokenLabel" aria-describedby="tokenUsage" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0">
+                                        <div class="rate-limit-progress" id="tokenProgress" style="width: 0%"></div>
+                                    </div>
+                                    <div class="rate-limit-text" id="tokenUsage" aria-live="polite">0 / 100K</div>
+                                </div>
+                                <div class="rate-limit-item">
+                                    <div class="rate-limit-label" id="requestLabel">Requests</div>
+                                    <div class="rate-limit-bar" role="progressbar" aria-labelledby="requestLabel" aria-describedby="requestUsage" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0">
+                                        <div class="rate-limit-progress" id="requestProgress" style="width: 0%"></div>
+                                    </div>
+                                    <div class="rate-limit-text" id="requestUsage" aria-live="polite">0 / 1000</div>
+                                </div>
+                                <div class="rate-limit-item">
+                                    <div class="rate-limit-label" id="costLabel">Cost</div>
+                                    <div class="rate-limit-bar" role="progressbar" aria-labelledby="costLabel" aria-describedby="costUsage" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0">
+                                        <div class="rate-limit-progress" id="costProgress" style="width: 0%"></div>
+                                    </div>
+                                    <div class="rate-limit-text" id="costUsage" aria-live="polite">$0.00 / $10.00</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </main>
+
+        <!-- Settings Panel -->
+        <aside class="settings-panel" id="settingsPanel" role="dialog" aria-modal="true" aria-labelledby="settingsTitle" aria-hidden="true">
+            <div class="settings-header">
+                <h2 id="settingsTitle">Settings</h2>
+                <button class="close-settings" id="closeSettings" aria-label="Close settings panel">×</button>
+            </div>
+            <form class="settings-content" role="form" aria-label="Extension settings">
+                <fieldset class="setting-group">
+                    <legend class="visually-hidden">Window Mode Preferences</legend>
+                    <label for="defaultWindowMode">Default Window Mode</label>
+                    <select id="defaultWindowMode" aria-label="Select default window mode">
+                        <option value="auto">Auto-detect based on screen size</option>
+                        <option value="compact">Compact (400x600)</option>
+                        <option value="large">Large (800x800)</option>
+                        <option value="masonry">Masonry (1200x900)</option>
+                    </select>
+                </fieldset>
+                <fieldset class="setting-group">
+                    <legend class="visually-hidden">API Configuration</legend>
+                    <label for="apiKeyInput">OpenAI API Key</label>
+                    <input type="password" id="apiKeyInput" placeholder="sk-..." aria-describedby="apiKeyHelp">
+                    <small id="apiKeyHelp">Your API key is stored locally and never shared</small>
+                </fieldset>
+                <fieldset class="setting-group">
+                    <legend class="visually-hidden">Avatar Preferences</legend>
+                    <label for="personalitySelect">Avatar Personality</label>
+                    <select id="personalitySelect" aria-label="Select avatar personality type">
+                        <option value="helpful">Helpful & Professional</option>
+                        <option value="casual">Casual & Friendly</option>
+                        <option value="academic">Academic & Detailed</option>
+                        <option value="creative">Creative & Engaging</option>
+                    </select>
+                </fieldset>
+                <fieldset class="setting-group">
+                    <legend class="visually-hidden">Automation Settings</legend>
+                    <label for="autoAnalyze">
+                        <input type="checkbox" id="autoAnalyze" checked aria-describedby="autoAnalyzeHelp">
+                        Auto-analyze pages when opened
+                    </label>
+                    <span id="autoAnalyzeHelp" class="visually-hidden">When enabled, the extension will automatically analyze each page you visit</span>
+                </fieldset>
+                <fieldset class="setting-group">
+                    <label for="enableStreaming">
+                        <input type="checkbox" id="enableStreaming" checked aria-describedby="streamingHelp">
+                        Enable streaming responses (real-time typing effect)
+                    </label>
+                    <span id="streamingHelp" class="visually-hidden">Shows AI responses as they are generated with a typing animation</span>
+                </fieldset>
+                <fieldset class="setting-group">
+                    <legend>Rate Limits (Daily)</legend>
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 8px;">
+                        <div>
+                            <label for="dailyTokenLimit" style="font-size: 12px;">Tokens</label>
+                            <input type="number" id="dailyTokenLimit" placeholder="100000" min="1000" step="1000" aria-label="Daily token limit">
+                        </div>
+                        <div>
+                            <label for="dailyCostLimit" style="font-size: 12px;">Cost ($)</label>
+                            <input type="number" id="dailyCostLimit" placeholder="10.00" min="0.01" step="0.01" aria-label="Daily cost limit in dollars">
+                        </div>
+                    </div>
+                </fieldset>
+                <button class="save-settings" id="saveSettings" type="submit" aria-label="Save all settings">Save Settings</button>
+                
+                <!-- Keyboard Shortcuts Section -->
+                <fieldset class="setting-group" style="margin-top: 20px; padding-top: 20px; border-top: 1px solid #e2e8f0;">
+                    <legend>Keyboard Shortcuts</legend>
+                    <div class="shortcuts-grid" style="display: grid; grid-template-columns: 1fr auto; gap: 8px; font-size: 13px;">
+                        <span>Switch to Compact Mode</span>
+                        <kbd class="keyboard-shortcut">Ctrl+Shift+C</kbd>
+                        <span>Switch to Large Mode</span>
+                        <kbd class="keyboard-shortcut">Ctrl+Shift+L</kbd>
+                        <span>Switch to Masonry Mode</span>
+                        <kbd class="keyboard-shortcut">Ctrl+Shift+M</kbd>
+                        <span>Open Detached Window</span>
+                        <kbd class="keyboard-shortcut">Ctrl+Shift+D</kbd>
+                    </div>
+                </fieldset>
+                <div style="margin-top: 20px; padding-top: 20px; border-top: 1px solid #e2e8f0;">
+                    <button class="onboarding-tour-btn" id="revisitOnboarding" type="button" aria-label="Revisit the onboarding tour" style="width: 100%; padding: 10px; background: transparent; border: 2px solid #667eea; color: #667eea; border-radius: 6px; font-size: 14px; font-weight: 500; cursor: pointer; transition: all 0.2s;">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="display: inline-block; margin-right: 8px; vertical-align: middle;" aria-hidden="true">
+                            <circle cx="12" cy="12" r="10"></circle>
+                            <path d="M12 16v-4"></path>
+                            <path d="M12 8h.01"></path>
+                        </svg>
+                        Revisit Onboarding Tour
+                    </button>
+                </div>
+            </form>
+        </aside>
+
+        <!-- Footer -->
+        <footer class="footer" role="contentinfo">
+            <div class="toolbar" role="toolbar" aria-label="Footer actions">
+                <button class="footer-btn" id="settingsBtn" aria-label="Open settings panel">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                        <circle cx="12" cy="12" r="3"></circle>
+                        <path d="m12 1 1.68 3.36L17 6.64l-1.32 2.36L17 11.36 13.68 13.64 12 17l-1.68-3.36L7 11.36l1.32-2.36L7 6.64l3.32-2.28L12 1z"></path>
+                    </svg>
+                    Settings
+                </button>
+                <button class="footer-btn" id="clearConversation" aria-label="Clear conversation history">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                        <polyline points="3 6 5 6 21 6"></polyline>
+                        <path d="m19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+                    </svg>
+                    Clear
+                </button>
+                <button class="footer-btn" id="keyboardHelpBtn" aria-label="Show keyboard shortcuts">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                        <rect x="2" y="4" width="20" height="16" rx="2"></rect>
+                        <path d="M6 8h.01"></path>
+                        <path d="M10 8h.01"></path>
+                        <path d="M14 8h.01"></path>
+                        <path d="M18 8h.01"></path>
+                        <path d="M8 12h.01"></path>
+                        <path d="M12 12h.01"></path>
+                        <path d="M16 12h.01"></path>
+                        <path d="M7 16h10"></path>
+                    </svg>
+                    Help
+                </button>
+            </div>
+            <div class="footer-info" role="status" aria-live="polite">
+                <span id="wordCount">0 words analyzed</span>
+                <span class="separator">•</span>
+                <span id="windowMode">Large Mode</span>
+            </div>
+        </footer>
+    </div>
+
+    <!-- Announcements for screen readers -->
+    <div class="visually-hidden" aria-live="assertive" aria-atomic="true" id="screenReaderAnnouncements"></div>
+    
+    <!-- Keyboard Navigation Help -->
+    <div class="keyboard-help" id="keyboardHelp" role="dialog" aria-modal="true" aria-labelledby="keyboardHelpTitle" aria-hidden="true" style="display: none;">
+        <div class="keyboard-help-content">
+            <h3 id="keyboardHelpTitle">Keyboard Navigation</h3>
+            <div class="keyboard-shortcuts">
+                <div class="shortcut-group">
+                    <h4>Layout Controls</h4>
+                    <ul>
+                        <li><kbd>Ctrl</kbd> + <kbd>1</kbd> - Default layout</li>
+                        <li><kbd>Ctrl</kbd> + <kbd>2</kbd> - 2x3 grid layout</li>
+                        <li><kbd>Ctrl</kbd> + <kbd>3</kbd> - 3x3 grid layout</li>
+                        <li><kbd>Ctrl</kbd> + <kbd>4</kbd> - Focus mode</li>
+                        <li><kbd>Ctrl</kbd> + <kbd>G</kbd> - Toggle grid indicators</li>
+                    </ul>
+                </div>
+                <div class="shortcut-group">
+                    <h4>Panel Navigation</h4>
+                    <ul>
+                        <li><kbd>Ctrl</kbd> + <kbd>→</kbd> - Next panel</li>
+                        <li><kbd>Ctrl</kbd> + <kbd>←</kbd> - Previous panel</li>
+                        <li><kbd>Ctrl</kbd> + <kbd>↑</kbd> - Panel above</li>
+                        <li><kbd>Ctrl</kbd> + <kbd>↓</kbd> - Panel below</li>
+                        <li><kbd>Ctrl</kbd> + <kbd>Enter</kbd> - Expand/collapse panel</li>
+                        <li><kbd>Ctrl</kbd> + <kbd>Escape</kbd> - Exit focus mode</li>
+                    </ul>
+                </div>
+            </div>
+            <button class="keyboard-help-close" onclick="document.getElementById('keyboardHelp').style.display='none';">Close</button>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="../lib/three.min.js"></script>
+    <script src="avatar-renderer.js"></script>
+    <script src="onboarding.js"></script>
+    <script src="popup.js"></script>
+    <script src="window-manager.js"></script>
+    
+    <!-- Modular Grid System Script -->
+    <script>
+        // Modular Grid System Implementation
+        class ModularGridSystem {
+            constructor() {
+                this.currentLayout = 'default';
+                this.focusedPanel = null;
+                this.keyboardNavIndex = 0;
+                this.panels = [];
+                this.init();
+            }
+
+            init() {
+                this.setupEventListeners();
+                this.setupKeyboardNavigation();
+                this.setupPanels();
+                this.updateGridIndicators();
+            }
+
+            setupEventListeners() {
+                // Grid mode buttons
+                document.querySelectorAll('.grid-mode-btn').forEach(btn => {
+                    btn.addEventListener('click', (e) => {
+                        const layout = e.target.dataset.layout;
+                        this.setLayout(layout);
+                    });
+                });
+
+                // Grid indicators toggle
+                const gridToggle = document.getElementById('gridIndicatorsToggle');
+                if (gridToggle) {
+                    gridToggle.addEventListener('click', () => {
+                        this.toggleGridIndicators();
+                    });
+                }
+
+                // Panel controls
+                document.querySelectorAll('.panel-expand-btn').forEach(btn => {
+                    btn.addEventListener('click', (e) => {
+                        const panel = e.target.closest('.panel');
+                        this.togglePanelExpansion(panel);
+                    });
+                });
+
+                document.querySelectorAll('.panel-close-btn').forEach(btn => {
+                    btn.addEventListener('click', (e) => {
+                        const panel = e.target.closest('.panel');
+                        this.closePanel(panel);
+                    });
+                });
+
+                // Window resize handler
+                window.addEventListener('resize', () => {
+                    this.handleResize();
+                });
+            }
+
+            setupKeyboardNavigation() {
+                document.addEventListener('keydown', (e) => {
+                    if (e.ctrlKey || e.metaKey) {
+                        switch(e.key) {
+                            case 'ArrowRight':
+                                e.preventDefault();
+                                this.navigateToNextPanel();
+                                break;
+                            case 'ArrowLeft':
+                                e.preventDefault();
+                                this.navigateToPrevPanel();
+                                break;
+                            case 'ArrowUp':
+                                e.preventDefault();
+                                this.navigateToAbovePanel();
+                                break;
+                            case 'ArrowDown':
+                                e.preventDefault();
+                                this.navigateToBelowPanel();
+                                break;
+                            case 'Enter':
+                                e.preventDefault();
+                                this.activateCurrentPanel();
+                                break;
+                            case 'Escape':
+                                e.preventDefault();
+                                this.exitFocusMode();
+                                break;
+                            case '1':
+                                e.preventDefault();
+                                this.setLayout('default');
+                                break;
+                            case '2':
+                                e.preventDefault();
+                                this.setLayout('2x3');
+                                break;
+                            case '3':
+                                e.preventDefault();
+                                this.setLayout('3x3');
+                                break;
+                            case '4':
+                                e.preventDefault();
+                                this.setLayout('focus');
+                                break;
+                            case 'g':
+                                e.preventDefault();
+                                this.toggleGridIndicators();
+                                break;
+                        }
+                    }
+                });
+            }
+
+            setupPanels() {
+                this.panels = Array.from(document.querySelectorAll('.panel'));
+                this.panels.forEach((panel, index) => {
+                    panel.setAttribute('data-panel-index', index);
+                    panel.addEventListener('click', () => {
+                        this.focusPanel(panel);
+                    });
+                });
+            }
+
+            setLayout(layout) {
+                const mainContent = document.querySelector('.main-content');
+                const prevLayout = this.currentLayout;
+                
+                // Update layout
+                this.currentLayout = layout;
+                mainContent.setAttribute('data-layout', layout);
+                
+                // Update active button
+                document.querySelectorAll('.grid-mode-btn').forEach(btn => {
+                    btn.classList.remove('active');
+                    if (btn.dataset.layout === layout) {
+                        btn.classList.add('active');
+                    }
+                });
+                
+                // Handle focus mode
+                if (layout === 'focus') {
+                    this.enterFocusMode();
+                } else if (prevLayout === 'focus') {
+                    this.exitFocusMode();
+                }
+                
+                // Update grid indicators
+                this.updateGridIndicators();
+                
+                // Announce layout change
+                this.announceLayoutChange(layout);
+            }
+
+            enterFocusMode() {
+                if (this.focusedPanel) {
+                    this.focusedPanel.classList.add('panel-focused');
+                } else {
+                    // Focus the first panel by default
+                    this.panels[0].classList.add('panel-focused');
+                    this.focusedPanel = this.panels[0];
+                }
+            }
+
+            exitFocusMode() {
+                this.panels.forEach(panel => {
+                    panel.classList.remove('panel-focused');
+                });
+                this.focusedPanel = null;
+            }
+
+            toggleGridIndicators() {
+                const indicators = document.getElementById('gridIndicators');
+                const toggle = document.getElementById('gridIndicatorsToggle');
+                
+                if (indicators && toggle) {
+                    indicators.classList.toggle('active');
+                    toggle.classList.toggle('active');
+                }
+            }
+
+            updateGridIndicators() {
+                const indicators = document.getElementById('gridIndicators');
+                if (!indicators) return;
+                
+                // Clear existing lines
+                indicators.innerHTML = '';
+                
+                // Add grid lines based on current layout
+                const lines = this.getGridLinesForLayout(this.currentLayout);
+                lines.forEach(line => {
+                    const lineElement = document.createElement('div');
+                    lineElement.className = `grid-line ${line.type}`;
+                    lineElement.style[line.type === 'grid-line-v' ? 'left' : 'top'] = line.position;
+                    indicators.appendChild(lineElement);
+                });
+            }
+
+            getGridLinesForLayout(layout) {
+                switch(layout) {
+                    case 'default':
+                    case '2x3':
+                        return [
+                            { type: 'grid-line-v', position: '50%' },
+                            { type: 'grid-line-h', position: '50%' },
+                            { type: 'grid-line-h', position: '75%' }
+                        ];
+                    case '3x3':
+                        return [
+                            { type: 'grid-line-v', position: '33.33%' },
+                            { type: 'grid-line-v', position: '66.66%' },
+                            { type: 'grid-line-h', position: '33.33%' },
+                            { type: 'grid-line-h', position: '66.66%' }
+                        ];
+                    case 'focus':
+                        return [];
+                    default:
+                        return [];
+                }
+            }
+
+            navigateToNextPanel() {
+                this.keyboardNavIndex = (this.keyboardNavIndex + 1) % this.panels.length;
+                this.focusPanel(this.panels[this.keyboardNavIndex]);
+            }
+
+            navigateToPrevPanel() {
+                this.keyboardNavIndex = (this.keyboardNavIndex - 1 + this.panels.length) % this.panels.length;
+                this.focusPanel(this.panels[this.keyboardNavIndex]);
+            }
+
+            navigateToAbovePanel() {
+                const currentPanel = this.panels[this.keyboardNavIndex];
+                const abovePanel = this.findPanelInDirection(currentPanel, 'up');
+                if (abovePanel) {
+                    this.keyboardNavIndex = this.panels.indexOf(abovePanel);
+                    this.focusPanel(abovePanel);
+                }
+            }
+
+            navigateToBelowPanel() {
+                const currentPanel = this.panels[this.keyboardNavIndex];
+                const belowPanel = this.findPanelInDirection(currentPanel, 'down');
+                if (belowPanel) {
+                    this.keyboardNavIndex = this.panels.indexOf(belowPanel);
+                    this.focusPanel(belowPanel);
+                }
+            }
+
+            findPanelInDirection(panel, direction) {
+                const panelRect = panel.getBoundingClientRect();
+                const centerX = panelRect.left + panelRect.width / 2;
+                const centerY = panelRect.top + panelRect.height / 2;
+                
+                let targetPanel = null;
+                let minDistance = Infinity;
+                
+                this.panels.forEach(otherPanel => {
+                    if (otherPanel === panel) return;
+                    
+                    const otherRect = otherPanel.getBoundingClientRect();
+                    const otherCenterX = otherRect.left + otherRect.width / 2;
+                    const otherCenterY = otherRect.top + otherRect.height / 2;
+                    
+                    let isInDirection = false;
+                    let distance = 0;
+                    
+                    if (direction === 'up' && otherCenterY < centerY) {
+                        isInDirection = true;
+                        distance = Math.sqrt(Math.pow(otherCenterX - centerX, 2) + Math.pow(otherCenterY - centerY, 2));
+                    } else if (direction === 'down' && otherCenterY > centerY) {
+                        isInDirection = true;
+                        distance = Math.sqrt(Math.pow(otherCenterX - centerX, 2) + Math.pow(otherCenterY - centerY, 2));
+                    }
+                    
+                    if (isInDirection && distance < minDistance) {
+                        minDistance = distance;
+                        targetPanel = otherPanel;
+                    }
+                });
+                
+                return targetPanel;
+            }
+
+            focusPanel(panel) {
+                // Remove keyboard nav from all panels
+                this.panels.forEach(p => {
+                    p.setAttribute('data-keyboard-nav', 'false');
+                });
+                
+                // Add keyboard nav to focused panel
+                panel.setAttribute('data-keyboard-nav', 'true');
+                panel.focus();
+                
+                // Update focused panel for focus mode
+                this.focusedPanel = panel;
+                
+                // Announce panel focus
+                const panelTitle = panel.querySelector('.panel-title')?.textContent || 'Panel';
+                this.announceToScreenReader(`${panelTitle} panel focused`);
+            }
+
+            activateCurrentPanel() {
+                const currentPanel = this.panels[this.keyboardNavIndex];
+                if (currentPanel) {
+                    this.togglePanelExpansion(currentPanel);
+                }
+            }
+
+            togglePanelExpansion(panel) {
+                const isExpanded = panel.classList.contains('panel-expanded');
+                
+                // Close all other expanded panels
+                this.panels.forEach(p => {
+                    if (p !== panel) {
+                        p.classList.remove('panel-expanded');
+                    }
+                });
+                
+                // Toggle current panel
+                panel.classList.toggle('panel-expanded');
+                
+                // Announce state change
+                const panelTitle = panel.querySelector('.panel-title')?.textContent || 'Panel';
+                const state = panel.classList.contains('panel-expanded') ? 'expanded' : 'collapsed';
+                this.announceToScreenReader(`${panelTitle} panel ${state}`);
+            }
+
+            closePanel(panel) {
+                panel.classList.add('panel-closed');
+                
+                // Announce panel closure
+                const panelTitle = panel.querySelector('.panel-title')?.textContent || 'Panel';
+                this.announceToScreenReader(`${panelTitle} panel closed`);
+                
+                // Remove from navigation after animation
+                setTimeout(() => {
+                    this.panels = this.panels.filter(p => p !== panel);
+                    this.setupPanels();
+                }, 300);
+            }
+
+            handleResize() {
+                // Update grid indicators on resize
+                this.updateGridIndicators();
+                
+                // Adjust layout for mobile
+                if (window.innerWidth <= 900) {
+                    if (this.currentLayout === '3x3') {
+                        this.setLayout('default');
+                    }
+                }
+            }
+
+            announceLayoutChange(layout) {
+                const layoutNames = {
+                    'default': 'Default layout',
+                    '2x3': '2 by 3 grid layout',
+                    '3x3': '3 by 3 grid layout',
+                    'focus': 'Focus mode layout'
+                };
+                
+                const announcement = `Layout changed to ${layoutNames[layout] || layout}`;
+                this.announceToScreenReader(announcement);
+            }
+
+            announceToScreenReader(message) {
+                const announcer = document.getElementById('screenReaderAnnouncements');
+                if (announcer) {
+                    announcer.textContent = message;
+                    // Clear after a short delay
+                    setTimeout(() => {
+                        announcer.textContent = '';
+                    }, 1000);
+                }
+            }
+
+            // Public method to get current layout
+            getCurrentLayout() {
+                return this.currentLayout;
+            }
+
+            // Public method to get focused panel
+            getFocusedPanel() {
+                return this.focusedPanel;
+            }
+        }
+
+        // Initialize the modular grid system when DOM is loaded
+        document.addEventListener('DOMContentLoaded', () => {
+            window.modularGrid = new ModularGridSystem();
+            
+            // Add helpful keyboard shortcuts info to the footer
+            const footerInfo = document.querySelector('.footer-info');
+            if (footerInfo) {
+                const keyboardHint = document.createElement('span');
+                keyboardHint.className = 'keyboard-hint';
+                keyboardHint.innerHTML = ' • Press <kbd>Ctrl</kbd>+<kbd>1-4</kbd> for layouts, <kbd>Ctrl</kbd>+<kbd>G</kbd> for grid';
+                keyboardHint.style.fontSize = '11px';
+                keyboardHint.style.opacity = '0.7';
+                footerInfo.appendChild(keyboardHint);
+            }
+            
+            // Setup keyboard help button
+            const keyboardHelpBtn = document.getElementById('keyboardHelpBtn');
+            const keyboardHelp = document.getElementById('keyboardHelp');
+            if (keyboardHelpBtn && keyboardHelp) {
+                keyboardHelpBtn.addEventListener('click', () => {
+                    keyboardHelp.style.display = 'block';
+                    keyboardHelp.setAttribute('aria-hidden', 'false');
+                    keyboardHelp.querySelector('.keyboard-help-close').focus();
+                });
+            }
+        });
+    </script>
+</body>
+</html>
