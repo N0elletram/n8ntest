@@ -1,0 +1,259 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Avatar Content Analyzer</title>
+    <link rel="stylesheet" href="popup.css">
+</head>
+<body>
+    <!-- Skip to main content link for keyboard navigation -->
+    <a href="#mainContent" class="skip-link">Skip to main content</a>
+    
+    <div id="app" role="application" aria-label="AI Avatar Content Analyzer">
+        <!-- Header -->
+        <header class="header" role="banner">
+            <div class="logo">
+                <img src="../assets/icons/icon32.png" alt="AI Avatar logo" class="logo-icon">
+                <h1 class="logo-text">AI Avatar</h1>
+            </div>
+            <div class="status-indicator" id="statusIndicator" role="status" aria-live="polite" aria-label="Extension status">
+                <span class="status-dot" aria-hidden="true"></span>
+                <span class="status-text">Ready</span>
+            </div>
+        </header>
+
+        <!-- Main Content Area -->
+        <main class="main-content" id="mainContent" role="main">
+            <!-- 3D Avatar Container -->
+            <section class="avatar-container" id="avatarContainer" aria-label="3D Avatar display">
+                <canvas id="avatarCanvas" width="300" height="200" role="img" aria-label="3D avatar animation" tabindex="0"></canvas>
+                <div class="avatar-overlay">
+                    <div class="thinking-indicator" id="thinkingIndicator" role="status" aria-live="polite" aria-hidden="true">
+                        <div class="thinking-dots" aria-hidden="true">
+                            <span></span>
+                            <span></span>
+                            <span></span>
+                        </div>
+                        <span class="thinking-text">Thinking...</span>
+                    </div>
+                    <div class="streaming-indicator" id="streamingIndicator" role="status" aria-live="polite" aria-hidden="true">
+                        <div class="streaming-wave" aria-hidden="true">
+                            <span></span>
+                            <span></span>
+                            <span></span>
+                            <span></span>
+                            <span></span>
+                        </div>
+                        <span class="streaming-text">AI is typing...</span>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Content Summary -->
+            <section class="content-summary" id="contentSummary" aria-label="Page analysis results">
+                <div class="summary-header">
+                    <h2>Page Analysis</h2>
+                    <button class="refresh-btn" id="refreshContent" aria-label="Re-analyze current page" title="Re-analyze page">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                            <polyline points="23 4 23 10 17 10"></polyline>
+                            <polyline points="1 20 1 14 7 14"></polyline>
+                            <path d="m3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"></path>
+                        </svg>
+                    </button>
+                </div>
+                <div class="summary-content" id="summaryContent" role="region" aria-live="polite" aria-busy="false">
+                    <div class="loading-state" role="status" aria-label="Loading page analysis">
+                        <div class="spinner" aria-hidden="true"></div>
+                        <span>Analyzing page content...</span>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Conversation Area -->
+            <section class="conversation-area" aria-label="Conversation with AI assistant">
+                <div class="conversation-history" id="conversationHistory" role="log" aria-label="Conversation history" aria-live="polite">
+                    <div class="welcome-message">
+                        <div class="avatar-message" role="article" aria-label="AI assistant message">
+                            <div class="message-avatar" aria-hidden="true">🤖</div>
+                            <div class="message-content">
+                                <p>Hi! I'm your AI avatar assistant. I've analyzed this webpage and I'm ready to discuss its content with you. What would you like to know?</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Input Area -->
+                <form class="input-area" role="form" aria-label="Message input form">
+                    <div class="input-container">
+                        <label for="messageInput" class="visually-hidden">Enter your message</label>
+                        <textarea 
+                            id="messageInput" 
+                            placeholder="Ask me anything about this page..."
+                            rows="2"
+                            maxlength="500"
+                            aria-label="Message input"
+                            aria-describedby="charCount"
+                            aria-required="true"
+                        ></textarea>
+                        <button id="sendButton" class="send-btn" disabled aria-label="Send message" type="submit">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                                <line x1="22" y1="2" x2="11" y2="13"></line>
+                                <polygon points="22,2 15,22 11,13 2,9"></polygon>
+                            </svg>
+                        </button>
+                        <button id="abortButton" class="abort-btn" style="display: none;" aria-label="Stop AI response" type="button">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                                <rect x="6" y="6" width="12" height="12"></rect>
+                            </svg>
+                        </button>
+                    </div>
+                    <div class="input-footer">
+                        <span class="char-count" id="charCount" role="status" aria-live="polite" aria-atomic="true">0/500</span>
+                        <div class="quick-actions" role="group" aria-label="Quick action buttons">
+                            <button class="quick-action" data-action="summarize" type="button" aria-label="Summarize the page content">Summarize</button>
+                            <button class="quick-action" data-action="explain" type="button" aria-label="Explain the page content">Explain</button>
+                            <button class="quick-action" data-action="questions" type="button" aria-label="Show key points from the page">Key Points</button>
+                        </div>
+                    </div>
+                </form>
+            </section>
+        </main>
+
+        <!-- Settings Panel -->
+        <aside class="settings-panel" id="settingsPanel" role="dialog" aria-modal="true" aria-labelledby="settingsTitle" aria-hidden="true">
+            <div class="settings-header">
+                <h2 id="settingsTitle">Settings</h2>
+                <button class="close-settings" id="closeSettings" aria-label="Close settings panel">×</button>
+            </div>
+            <form class="settings-content" role="form" aria-label="Extension settings">
+                <fieldset class="setting-group">
+                    <legend class="visually-hidden">API Configuration</legend>
+                    <label for="apiKeyInput">OpenAI API Key</label>
+                    <input type="password" id="apiKeyInput" placeholder="sk-..." aria-describedby="apiKeyHelp">
+                    <small id="apiKeyHelp">Your API key is stored locally and never shared</small>
+                </fieldset>
+                <fieldset class="setting-group">
+                    <legend class="visually-hidden">Avatar Preferences</legend>
+                    <label for="personalitySelect">Avatar Personality</label>
+                    <select id="personalitySelect" aria-label="Select avatar personality type">
+                        <option value="helpful">Helpful & Professional</option>
+                        <option value="casual">Casual & Friendly</option>
+                        <option value="academic">Academic & Detailed</option>
+                        <option value="creative">Creative & Engaging</option>
+                    </select>
+                </fieldset>
+                <fieldset class="setting-group">
+                    <legend class="visually-hidden">Automation Settings</legend>
+                    <label for="autoAnalyze">
+                        <input type="checkbox" id="autoAnalyze" checked aria-describedby="autoAnalyzeHelp">
+                        Auto-analyze pages when opened
+                    </label>
+                    <span id="autoAnalyzeHelp" class="visually-hidden">When enabled, the extension will automatically analyze each page you visit</span>
+                </fieldset>
+                <fieldset class="setting-group">
+                    <label for="enableStreaming">
+                        <input type="checkbox" id="enableStreaming" checked aria-describedby="streamingHelp">
+                        Enable streaming responses (real-time typing effect)
+                    </label>
+                    <span id="streamingHelp" class="visually-hidden">Shows AI responses as they are generated with a typing animation</span>
+                </fieldset>
+                <fieldset class="setting-group">
+                    <legend>Rate Limits (Daily)</legend>
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 8px;">
+                        <div>
+                            <label for="dailyTokenLimit" style="font-size: 12px;">Tokens</label>
+                            <input type="number" id="dailyTokenLimit" placeholder="100000" min="1000" step="1000" aria-label="Daily token limit">
+                        </div>
+                        <div>
+                            <label for="dailyCostLimit" style="font-size: 12px;">Cost ($)</label>
+                            <input type="number" id="dailyCostLimit" placeholder="10.00" min="0.01" step="0.01" aria-label="Daily cost limit in dollars">
+                        </div>
+                    </div>
+                </fieldset>
+                <button class="save-settings" id="saveSettings" type="submit" aria-label="Save all settings">Save Settings</button>
+                <div style="margin-top: 20px; padding-top: 20px; border-top: 1px solid #e2e8f0;">
+                    <button class="onboarding-tour-btn" id="revisitOnboarding" type="button" aria-label="Revisit the onboarding tour" style="width: 100%; padding: 10px; background: transparent; border: 2px solid #667eea; color: #667eea; border-radius: 6px; font-size: 14px; font-weight: 500; cursor: pointer; transition: all 0.2s;">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="display: inline-block; margin-right: 8px; vertical-align: middle;" aria-hidden="true">
+                            <circle cx="12" cy="12" r="10"></circle>
+                            <path d="M12 16v-4"></path>
+                            <path d="M12 8h.01"></path>
+                        </svg>
+                        Revisit Onboarding Tour
+                    </button>
+                </div>
+            </form>
+        </aside>
+
+        <!-- Rate Limit Status -->
+        <section class="rate-limit-status" id="rateLimitStatus" role="region" aria-label="Usage statistics">
+            <div class="rate-limit-header">
+                <h3 class="rate-limit-title">Usage Today</h3>
+                <button class="rate-limit-refresh" id="refreshRateLimit" aria-label="Refresh usage statistics" title="Refresh usage stats">
+                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                        <polyline points="23 4 23 10 17 10"></polyline>
+                        <polyline points="1 20 1 14 7 14"></polyline>
+                        <path d="m3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"></path>
+                    </svg>
+                </button>
+            </div>
+            <div class="rate-limit-bars" role="group" aria-label="Usage meters">
+                <div class="rate-limit-item">
+                    <div class="rate-limit-label" id="tokenLabel">Tokens</div>
+                    <div class="rate-limit-bar" role="progressbar" aria-labelledby="tokenLabel" aria-describedby="tokenUsage" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0">
+                        <div class="rate-limit-progress" id="tokenProgress" style="width: 0%"></div>
+                    </div>
+                    <div class="rate-limit-text" id="tokenUsage" aria-live="polite">0 / 100K</div>
+                </div>
+                <div class="rate-limit-item">
+                    <div class="rate-limit-label" id="requestLabel">Requests</div>
+                    <div class="rate-limit-bar" role="progressbar" aria-labelledby="requestLabel" aria-describedby="requestUsage" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0">
+                        <div class="rate-limit-progress" id="requestProgress" style="width: 0%"></div>
+                    </div>
+                    <div class="rate-limit-text" id="requestUsage" aria-live="polite">0 / 1000</div>
+                </div>
+                <div class="rate-limit-item">
+                    <div class="rate-limit-label" id="costLabel">Cost</div>
+                    <div class="rate-limit-bar" role="progressbar" aria-labelledby="costLabel" aria-describedby="costUsage" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0">
+                        <div class="rate-limit-progress" id="costProgress" style="width: 0%"></div>
+                    </div>
+                    <div class="rate-limit-text" id="costUsage" aria-live="polite">$0.00 / $10.00</div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Footer -->
+        <footer class="footer" role="contentinfo">
+            <div class="toolbar" role="toolbar" aria-label="Footer actions">
+                <button class="footer-btn" id="settingsBtn" aria-label="Open settings panel">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                        <circle cx="12" cy="12" r="3"></circle>
+                        <path d="m12 1 1.68 3.36L17 6.64l-1.32 2.36L17 11.36 13.68 13.64 12 17l-1.68-3.36L7 11.36l1.32-2.36L7 6.64l3.32-2.28L12 1z"></path>
+                    </svg>
+                    Settings
+                </button>
+                <button class="footer-btn" id="clearConversation" aria-label="Clear conversation history">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                        <polyline points="3 6 5 6 21 6"></polyline>
+                        <path d="m19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+                    </svg>
+                    Clear
+                </button>
+            </div>
+            <div class="footer-info" role="status" aria-live="polite">
+                <span id="wordCount">0 words analyzed</span>
+            </div>
+        </footer>
+    </div>
+
+    <!-- Announcements for screen readers -->
+    <div class="visually-hidden" aria-live="assertive" aria-atomic="true" id="screenReaderAnnouncements"></div>
+
+    <!-- Scripts -->
+    <script src="../lib/three.min.js"></script>
+    <script src="avatar-renderer.js"></script>
+    <script src="onboarding.js"></script>
+    <script src="popup.js"></script>
+</body>
+</html>
+

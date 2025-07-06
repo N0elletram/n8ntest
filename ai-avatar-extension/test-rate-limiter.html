@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Rate Limiter Test</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        .test-section {
+            margin: 20px 0;
+            padding: 20px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+        }
+        button {
+            padding: 10px 20px;
+            margin: 5px;
+            cursor: pointer;
+        }
+        .output {
+            margin-top: 10px;
+            padding: 10px;
+            background: #f5f5f5;
+            border-radius: 3px;
+            font-family: monospace;
+            white-space: pre-wrap;
+        }
+        .success { color: green; }
+        .error { color: red; }
+    </style>
+</head>
+<body>
+    <h1>Rate Limiter Integration Test</h1>
+    
+    <div class="test-section">
+        <h2>Test Rate Limiter Class</h2>
+        <button onclick="testRateLimiter()">Test Rate Limiter</button>
+        <div id="rateLimiterOutput" class="output"></div>
+    </div>
+    
+    <div class="test-section">
+        <h2>Test Service Worker Integration</h2>
+        <button onclick="testServiceWorker()">Test Service Worker</button>
+        <div id="serviceWorkerOutput" class="output"></div>
+    </div>
+    
+    <div class="test-section">
+        <h2>Test API Call with Rate Limiting</h2>
+        <button onclick="testAPICall()">Make Test API Call</button>
+        <div id="apiOutput" class="output"></div>
+    </div>
+    
+    <div class="test-section">
+        <h2>View Current Stats</h2>
+        <button onclick="viewStats()">View Stats</button>
+        <div id="statsOutput" class="output"></div>
+    </div>
+
+    <script src="background/rate-limiter.js"></script>
+    <script>
+        async function testRateLimiter() {
+            const output = document.getElementById('rateLimiterOutput');
+            try {
+                // Create a rate limiter instance
+                const rateLimiter = new RateLimiter();
+                await rateLimiter.initialize();
+                
+                // Test token counting
+                const testText = "This is a test message to count tokens.";
+                const tokenCount = rateLimiter.countTokens(testText);
+                
+                // Test rate limit check
+                const checkResult = await rateLimiter.checkRequest({
+                    model: 'gpt-4',
+                    prompt: testText,
+                    estimatedCompletion: 100
+                });
+                
+                output.innerHTML = `<span class="success">✓ Rate Limiter initialized successfully</span>
+Token count for test text: ${tokenCount}
+Rate limit check result: ${JSON.stringify(checkResult, null, 2)}`;
+            } catch (error) {
+                output.innerHTML = `<span class="error">✗ Error: ${error.message}</span>`;
+            }
+        }
+        
+        async function testServiceWorker() {
+            const output = document.getElementById('serviceWorkerOutput');
+            try {
+                // Send a test message to the service worker
+                chrome.runtime.sendMessage(
+                    { action: 'getRateLimitStats' },
+                    (response) => {
+                        if (response.success) {
+                            output.innerHTML = `<span class="success">✓ Service worker integration working</span>
+Stats received: ${JSON.stringify(response.stats, null, 2)}`;
+                        } else {
+                            output.innerHTML = `<span class="error">✗ Error: ${response.error}</span>`;
+                        }
+                    }
+                );
+            } catch (error) {
+                output.innerHTML = `<span class="error">✗ Error: ${error.message}</span>`;
+            }
+        }
+        
+        async function testAPICall() {
+            const output = document.getElementById('apiOutput');
+            output.innerHTML = 'Making test API call...';
+            
+            try {
+                chrome.runtime.sendMessage(
+                    { 
+                        action: 'generateResponse',
+                        message: 'Hello, this is a test message.',
+                        pageContent: {
+                            title: 'Test Page',
+                            url: 'https://example.com',
+                            contentType: 'general_content',
+                            wordCount: 100,
+                            content: 'This is test content.'
+                        }
+                    },
+                    (response) => {
+                        if (response.success) {
+                            output.innerHTML = `<span class="success">✓ API call successful</span>
+Response: ${response.response}
+Token usage: ${JSON.stringify(response.tokenUsage, null, 2)}`;
+                        } else if (response.rateLimitError) {
+                            output.innerHTML = `<span class="error">✗ Rate limit exceeded</span>
+Limit type: ${response.limitType}
+Reason: ${response.error}
+${response.retryAfter ? `Retry after: ${response.retryAfter} seconds` : ''}`;
+                        } else {
+                            output.innerHTML = `<span class="error">✗ Error: ${response.error}</span>`;
+                        }
+                    }
+                );
+            } catch (error) {
+                output.innerHTML = `<span class="error">✗ Error: ${error.message}</span>`;
+            }
+        }
+        
+        async function viewStats() {
+            const output = document.getElementById('statsOutput');
+            try {
+                chrome.runtime.sendMessage(
+                    { action: 'getRateLimitStats' },
+                    (response) => {
+                        if (response.success) {
+                            const stats = response.stats;
+                            output.innerHTML = `<span class="success">Current Usage Statistics:</span>
+
+Daily Usage:
+- Tokens: ${stats.daily.usage.tokens.total} / ${stats.daily.limits.tokens} (${stats.daily.percentages.tokens.toFixed(1)}%)
+- Requests: ${stats.daily.usage.requests} / ${stats.daily.limits.requests} (${stats.daily.percentages.requests.toFixed(1)}%)
+- Cost: $${stats.daily.usage.cost.toFixed(2)} / $${stats.daily.limits.cost.toFixed(2)} (${stats.daily.percentages.cost.toFixed(1)}%)
+
+Monthly Usage:
+- Tokens: ${stats.monthly.usage.tokens.total} / ${stats.monthly.limits.tokens} (${stats.monthly.percentages.tokens.toFixed(1)}%)
+- Requests: ${stats.monthly.usage.requests} / ${stats.monthly.limits.requests} (${stats.monthly.percentages.requests.toFixed(1)}%)
+- Cost: $${stats.monthly.usage.cost.toFixed(2)} / $${stats.monthly.limits.cost.toFixed(2)} (${stats.monthly.percentages.cost.toFixed(1)}%)
+
+Current minute requests: ${stats.currentMinuteRequests}`;
+                        } else {
+                            output.innerHTML = `<span class="error">✗ Error: ${response.error}</span>`;
+                        }
+                    }
+                );
+            } catch (error) {
+                output.innerHTML = `<span class="error">✗ Error: ${error.message}</span>`;
+            }
+        }
+    </script>
+</body>
+</html>

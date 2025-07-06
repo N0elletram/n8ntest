@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Streaming Functionality</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            max-width: 800px;
+            margin: 40px auto;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+        .container {
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        h1 {
+            color: #333;
+            margin-bottom: 20px;
+        }
+        h2 {
+            color: #666;
+            margin-top: 30px;
+            margin-bottom: 15px;
+        }
+        .feature {
+            background: #f8f9fa;
+            padding: 15px;
+            margin: 10px 0;
+            border-radius: 5px;
+            border-left: 4px solid #667eea;
+        }
+        .test-section {
+            margin: 20px 0;
+            padding: 20px;
+            background: #fafafa;
+            border-radius: 8px;
+        }
+        code {
+            background: #e9ecef;
+            padding: 2px 6px;
+            border-radius: 3px;
+            font-family: 'Monaco', 'Consolas', monospace;
+            font-size: 14px;
+        }
+        ul {
+            line-height: 1.8;
+        }
+        .highlight {
+            background: #fff3cd;
+            padding: 15px;
+            border-radius: 5px;
+            margin: 20px 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>AI Avatar Chrome Extension - Streaming Test Page</h1>
+        
+        <p>This page is designed to test the streaming functionality of the AI Avatar Chrome Extension. Open the extension popup while viewing this page to test the new streaming features.</p>
+
+        <h2>New Streaming Features</h2>
+        
+        <div class="feature">
+            <strong>Real-time Response Streaming</strong>
+            <p>Messages from the AI now stream in real-time, providing a more interactive experience. You'll see the text appear word by word as the AI generates its response.</p>
+        </div>
+
+        <div class="feature">
+            <strong>Visual Streaming Indicators</strong>
+            <p>The extension now shows animated wave indicators when the AI is typing, replacing the static "thinking" indicator during the streaming phase.</p>
+        </div>
+
+        <div class="feature">
+            <strong>Abort Functionality</strong>
+            <p>You can now stop a streaming response mid-generation by clicking the red abort button that appears during streaming.</p>
+        </div>
+
+        <div class="feature">
+            <strong>Avatar State Updates</strong>
+            <p>The 3D avatar transitions to a "speaking" state during streaming, providing visual feedback that matches the streaming text.</p>
+        </div>
+
+        <div class="feature">
+            <strong>Settings Toggle</strong>
+            <p>Streaming can be enabled or disabled in the settings panel. When disabled, responses will appear all at once like before.</p>
+        </div>
+
+        <h2>How to Test</h2>
+        
+        <div class="test-section">
+            <h3>1. Basic Streaming Test</h3>
+            <ul>
+                <li>Open the extension popup</li>
+                <li>Ask a question about this page</li>
+                <li>Watch as the response streams in real-time</li>
+                <li>Notice the animated wave indicator and avatar state</li>
+            </ul>
+        </div>
+
+        <div class="test-section">
+            <h3>2. Abort Test</h3>
+            <ul>
+                <li>Start a new conversation</li>
+                <li>While the AI is streaming a response, click the red abort button</li>
+                <li>The response should stop immediately with an "(Response aborted)" note</li>
+            </ul>
+        </div>
+
+        <div class="test-section">
+            <h3>3. Toggle Streaming</h3>
+            <ul>
+                <li>Go to Settings in the extension</li>
+                <li>Uncheck "Enable streaming responses"</li>
+                <li>Send a message - it should appear all at once</li>
+                <li>Re-enable streaming and test again</li>
+            </ul>
+        </div>
+
+        <div class="test-section">
+            <h3>4. Error Handling</h3>
+            <ul>
+                <li>Test with an invalid API key to see error handling</li>
+                <li>Test rate limit handling during streaming</li>
+                <li>Test network interruption scenarios</li>
+            </ul>
+        </div>
+
+        <h2>Technical Implementation</h2>
+        
+        <p>The streaming implementation uses:</p>
+        <ul>
+            <li><code>Server-Sent Events (SSE)</code> for real-time data streaming</li>
+            <li><code>AbortController</code> for canceling ongoing streams</li>
+            <li><code>Chrome Runtime Messages</code> for communication between service worker and popup</li>
+            <li><code>CSS animations</code> for visual feedback</li>
+            <li><code>Three.js animations</code> for avatar state changes</li>
+        </ul>
+
+        <div class="highlight">
+            <strong>Note:</strong> Make sure you have configured your OpenAI API key in the extension settings before testing. The streaming feature requires a valid API key to function.
+        </div>
+
+        <h2>Sample Questions to Test</h2>
+        <ul>
+            <li>"Can you summarize the streaming features described on this page?"</li>
+            <li>"Explain how the abort functionality works in detail"</li>
+            <li>"What are the technical components used for streaming?"</li>
+            <li>"Tell me about the visual indicators mentioned on this page"</li>
+        </ul>
+    </div>
+</body>
+</html>
